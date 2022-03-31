@@ -98,3 +98,24 @@ s.close();
 // Closing db ends the connection with the database
 db.close();
 ```
+
+Recursively dump an FTP folder to the local file system
+-------------------------------------------------------
+
+```java
+// Open a file system to some local folder
+FileSystem local = new HardDisk("/home/sylvain/somefolder");
+local.open();
+
+// Open a file system to some remote folder
+FileSystem remote = new FtpConnection("10.1.2.3", "user", "pass");
+remote.open();
+remote.chdir("some/other/folder");
+
+// Recursively copy all files from remote into local
+FileUtils.copy(remote, local);
+
+// Close the connections
+local.close();
+remote.close();
+```

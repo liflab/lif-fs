@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  Configuration file for AntRun.
+  
+  Use this file to override the default properties contained
+  in build.xml. For example, to override the build.jar.filename
+  property (which sets the name of the compiled jar file), add
+  an element
+  
+  <jar>
+    <filename>foo</filename>
+  </jar>
+  
+  inside the <build> element.
+  
+  **Caveat emptor:** in some cases, changing this file and running ant
+  again will result in Ant using a cached version of the old file! Run
+  "ant dummy" to make sure that the correct data is being read. Otherwise
+  you might need to run "ant clean" and start over.
+-->
+<build>
+  <!-- Uncomment any of these if you want to override the build
+       script's default values -->
+
+  <!-- The project's name -->
+  <name>lif-fs FTP</name>
+  
+  <!-- The project's version number -->
+  <version>0.1-alpha</version>
+  
+  <!-- The project's author. Currently this only
+  shows up in the footer of the Javadoc documentation. -->
+  <author>Sylvain Hall&#233;</author>
+  
+  <!-- The project's main class -->
+  <!--<mainclass>ca.uqac.lif.petitpoucet.Main</mainclass>-->
+  
+  <!-- Installation folders -->
+  <srcdir>src</srcdir>
+  <bindir>bin</bindir>
+  <docdir>doc</docdir>
+  <depdir>dep</depdir>
+  <libdir>lib</libdir>
+  <test>
+    <srcdir>srctest</srcdir>
+    <bindir>bintest</bindir>
+  </test>
+  
+  <!-- Output jar -->
+  <jar>
+    <filename>../lif-fs-core.jar</filename>
+    <withdoc>false</withdoc>
+    <withdeps>true</withdeps>
+  </jar>
+  
+  <!--
+    Write JAR dependencies here.
+  -->
+  <dependencies>
+    <dependency>
+      <name>Apache Commons Net</name>
+      <classname>org.apache.commons.net.ftp.FTP</classname>
+      <files>
+        <zip>https://dlcdn.apache.org//commons/net/binaries/commons-net-3.8.0-bin.zip</zip>
+      </files>
+      <bundle>true</bundle>
+    </dependency>
+    <dependency>
+      <name>slf4j</name> <!-- Required by Commons Net -->
+      <classname>org.apache.commons.logging.Log</classname>
+      <files>
+        <jar>https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar</jar>
+        <jar>https://repo1.maven.org/maven2/org/slf4j/slf4j-nop/1.7.36/slf4j-nop-1.7.36.jar</jar>
+      </files>
+      <bundle>true</bundle>
+    </dependency>
+    <dependency>
+      <name>Mock FTP server</name>
+      <classname>org.mockftpserver.core.server.AbstractFtpServer</classname>
+      <files>
+        <zip>https://sourceforge.net/projects/mockftpserver/files/mockftpserver/MockFtpServer%20Version%202.7.1/MockFtpServer-2.7.1-bin.zip/download</zip>
+      </files>
+      <bundle>false</bundle> <!-- only used for testing -->
+    </dependency>
+  </dependencies>
+</build>
