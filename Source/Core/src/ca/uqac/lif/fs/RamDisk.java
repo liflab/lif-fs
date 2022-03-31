@@ -77,10 +77,6 @@ public class RamDisk implements FileSystem
 	@Override
 	public void close() throws FileSystemException
 	{
-		if (m_state == OpenState.CLOSED)
-		{
-			throw new FileSystemException("File system has already been closed");
-		}
 		m_state = OpenState.CLOSED;
 	}
 

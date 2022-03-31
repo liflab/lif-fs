@@ -20,37 +20,23 @@ package ca.uqac.lif.fs;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import org.junit.Test;
 
 /**
- * Unit tests for {@link FileUtils}.
+ * Unit tests for {@link ReadOnlyFileSystem}.
  */
-public class FileUtilsTest
+public class ReadOnlyFileSystemTest
 {
 	@Test
-	public void testCopyStreams1() throws FileSystemException
+	public void test1() throws FileSystemException
 	{
-		ByteArrayInputStream bais = new ByteArrayInputStream("foobar".getBytes());
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		FileUtils.copy(bais, baos);
-		String s = new String(baos.toByteArray());
-		assertEquals("foobar", s);
-	}
-	
-	@Test
-	public void testCopyFileSystem1() throws FileSystemException
-	{
-		RamDisk rd1 = new RamDisk();
-		rd1.open();
-		TempFolderTest.populate(rd1);
-		RamDisk fs = new RamDisk();
+		RamDisk rd = new RamDisk();
+		rd.open();
+		TempFolderTest.populate(rd);
+		ReadOnlyFileSystem fs = new ReadOnlyFileSystem(rd);
 		fs.open();
-		FileUtils.copy(rd1, fs);
-		rd1.close();
 		List<String> listing = fs.ls();
 		assertEquals(4, listing.size());
 		assertTrue(listing.contains("abc"));
@@ -67,5 +53,38 @@ public class FileUtilsTest
 		assertTrue(listing.contains("c.txt"));
 		assertTrue(listing.contains("d.txt"));
 		fs.close();
+	}
+	
+	@Test(expected = FileSystemException.class)
+	public void testError1() throws FileSystemException
+	{
+		RamDisk rd = new RamDisk();
+		rd.open();
+		TempFolderTest.populate(rd);
+		ReadOnlyFileSystem fs = new ReadOnlyFileSystem(rd);
+		fs.open();
+		fs.mkdir("blabla");
+	}
+	
+	@Test(expected = FileSystemException.class)
+	public void testError2() throws FileSystemException
+	{
+		RamDisk rd = new RamDisk();
+		rd.open();
+		TempFolderTest.populate(rd);
+		ReadOnlyFileSystem fs = new ReadOnlyFileSystem(rd);
+		fs.open();
+		fs.rmdir("def");
+	}
+	
+	@Test(expected = FileSystemException.class)
+	public void testError3() throws FileSystemException
+	{
+		RamDisk rd = new RamDisk();
+		rd.open();
+		TempFolderTest.populate(rd);
+		ReadOnlyFileSystem fs = new ReadOnlyFileSystem(rd);
+		fs.open();
+		fs.delete("e.txt");
 	}
 }

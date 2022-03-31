@@ -19,7 +19,6 @@ package ca.uqac.lif.fs;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 

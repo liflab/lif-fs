@@ -37,22 +37,22 @@ public class JarFile implements FileSystem
 	 * The class relative to which the files are located.
 	 */
 	protected Class<?> m_referenceClass;
-	
+
 	/**
 	 * The path representing the current directory.
 	 */
 	protected FilePath m_currentDir;
-	
+
 	/**
 	 * A stack containing the history of current directories.
 	 */
 	/*@ non_null @*/ protected Stack<FilePath> m_dirStack;
-	
+
 	/**
 	 * The current state of the file system.
 	 */
 	protected OpenState m_state;
-	
+
 	/**
 	 * Creates a new instance of the file system.
 	 * @param reference The class relative to which the files are located
@@ -64,7 +64,7 @@ public class JarFile implements FileSystem
 		m_currentDir = new FilePath("");
 		m_dirStack = new Stack<FilePath>();
 	}
-	
+
 	@Override
 	public void open() throws FileSystemException
 	{
@@ -86,7 +86,7 @@ public class JarFile implements FileSystem
 	{
 		return ls(m_currentDir.chdir(new FilePath(path)));
 	}
-	
+
 	protected List<String> ls(FilePath fp) throws FileSystemException
 	{
 		if (m_state != OpenState.OPEN)
@@ -97,14 +97,25 @@ public class JarFile implements FileSystem
 		File f;
 		try 
 		{
-			URI url = m_referenceClass.getResource(fp.toString()).toURI();
-			f = new File(url);
-			if (f != null)
+			String path = fp.toString();
+			if (path.startsWith(FilePath.SLASH))
 			{
-				for (String uris : f.list())
-				{
-					listing.add(uris);
-				}
+				path = path.substring(1);
+			}
+			URL url = m_referenceClass.getResource(path);
+			if (url == null)
+			{
+				throw new FileSystemException("No such path");
+			}
+			URI uri = url.toURI();
+			if (uri == null)
+			{
+				throw new FileSystemException("No such path");
+			}
+			f = new File(uri);
+			for (String uris : f.list())
+			{
+				listing.add(uris);
 			}
 		}
 		catch (URISyntaxException e)
@@ -118,15 +129,60 @@ public class JarFile implements FileSystem
 	public boolean isDirectory(String path) throws FileSystemException
 	{
 		FilePath filename = m_currentDir.chdir(path);
-		URL u = m_referenceClass.getResource(filename.toString());
-		return false;
+		String s_filename = filename.toString();
+		if (s_filename.startsWith(FilePath.SLASH))
+		{
+			s_filename = s_filename.substring(1);
+		}
+		URL u = m_referenceClass.getResource(s_filename);
+		if (u == null)
+		{
+			return false;
+		}
+		try
+		{
+			URI uri = u.toURI();
+			if (uri == null)
+			{
+				return false;
+			}
+			File f = new File(uri);
+			return f.isDirectory();
+		}
+		catch (URISyntaxException e)
+		{
+			throw new FileSystemException(e);
+		}
 	}
 
 	@Override
 	public boolean isFile(String path) throws FileSystemException
 	{
-		// TODO Auto-generated method stub
-		return false;
+		FilePath filename = m_currentDir.chdir(path);
+		String s_filename = filename.toString();
+		if (s_filename.startsWith(FilePath.SLASH))
+		{
+			s_filename = s_filename.substring(1);
+		}
+		URL u = m_referenceClass.getResource(s_filename);
+		if (u == null)
+		{
+			return false;
+		}
+		try
+		{
+			URI uri = u.toURI();
+			if (uri == null)
+			{
+				return false;
+			}
+			File f = new File(uri);
+			return f.isFile();
+		}
+		catch (URISyntaxException e)
+		{
+			throw new FileSystemException(e);
+		}
 	}
 
 	@Override
@@ -143,7 +199,12 @@ public class JarFile implements FileSystem
 			throw new FileSystemException("File system is not open");
 		}
 		FilePath current = m_currentDir.chdir(filename);
-		InputStream is = m_referenceClass.getResourceAsStream(current.toString());
+		String s_filename = current.toString();
+		if (s_filename.startsWith(FilePath.SLASH))
+		{
+			s_filename = s_filename.substring(1);
+		}
+		InputStream is = m_referenceClass.getResourceAsStream(s_filename);
 		if (is == null)
 		{
 			throw new FileSystemException("File " + current + " not found");
@@ -161,13 +222,13 @@ public class JarFile implements FileSystem
 		m_dirStack.push(m_currentDir);
 		m_currentDir = m_currentDir.chdir(path);
 	}
-	
+
 	@Override
 	public void pushd(String path) throws FileSystemException
 	{
 		chdir(path);
 	}
-	
+
 	@Override
 	public void popd() throws FileSystemException
 	{
