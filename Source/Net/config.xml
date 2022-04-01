@@ -82,5 +82,21 @@
       </files>
       <bundle>false</bundle> <!-- only used for testing -->
     </dependency>
+    <dependency>
+      <name>Sardine WebDAV client</name>
+      <classname>com.github.sardine.Sardine</classname>
+      <files>
+        <jar>https://repo1.maven.org/maven2/com/github/lookfirst/sardine/5.10/sardine-5.10.jar</jar>
+      </files>
+      <bundle>true</bundle>
+    </dependency>
+    <dependency> <!-- Sardine dependency -->
+      <name>Jakarta XML Binding API</name>
+      <classname>com.github.sardine.Sardine</classname>
+      <files>
+        <jar>https://repo1.maven.org/maven2/jakarta/xml/bind/jakarta.xml.bind-api/2.3.2/jakarta.xml.bind-api-2.3.2.jar</jar>
+      </files>
+      <bundle>true</bundle>
+    </dependency>
   </dependencies>
 </build>

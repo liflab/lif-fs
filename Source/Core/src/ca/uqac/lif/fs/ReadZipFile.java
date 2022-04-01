@@ -20,17 +20,24 @@ package ca.uqac.lif.fs;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Stack;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import ca.uqac.lif.fs.FileSystem.OpenState;
-
-public class ReadZipFile implements FileSystem
+/**
+ * Exposes the contents of a zip archive as a read-only file system.
+ * Internally, the class descends from {@link RamDisk}; however, it does
+ * <em>not</em> extract the archive into memory: it only uses its parent's
+ * tree structure to store the listing of folders without having to re-scan
+ * the file entries in the zip archive every time an operation such as
+ * {@link #ls()} is invoked. Only when {@link #readFrom(String)} is called
+ * does the file system move the location of the pointer within the zip
+ * file stream to the appropriate location; the corresponding file is then
+ * extracted on the fly. This way, it is possible to interact with a large
+ * archive, without the need to completely uncompress it before use.
+ * 
+ * @author Sylvain Hallé
+ */
+public class ReadZipFile extends RamDisk
 {
 	/**
 	 * A stream to read from a zip file.
@@ -43,21 +50,6 @@ public class ReadZipFile implements FileSystem
 	/*@ non_null @*/ protected InputStream m_input;
 	
 	/**
-	 * The current working directory within the zip archive
-	 */
-	/*@ non_null @*/ protected FilePath m_currentDir;
-	
-	/**
-	 * A stack containing the history of current directories.
-	 */
-	/*@ non_null @*/ protected Stack<FilePath> m_dirStack;
-	
-	/**
-	 * A set containing a summary of all the files inside the zip file.
-	 */
-	protected Set<ZipEntrySummary> m_zipContents;
-	
-	/**
 	 * Creates a new zip file system in read mode.
 	 * @param input The input stream from which the contents of the zip file is
 	 * to be read
@@ -66,13 +58,13 @@ public class ReadZipFile implements FileSystem
 	{
 		super();
 		m_input = input;
-		m_zipContents = new HashSet<ZipEntrySummary>();
-		m_dirStack = new Stack<FilePath>();
 	}
 	
 	@Override
 	public void open() throws FileSystemException
 	{
+		super.open();
+		m_input.mark(0);
 		m_zipInput = new ZipInputStream(m_input);
 		ZipEntry entry;
 		try
@@ -80,57 +72,21 @@ public class ReadZipFile implements FileSystem
 			entry = m_zipInput.getNextEntry();
 			while (entry != null)
 			{
-				m_zipContents.add(new ZipEntrySummary(entry));
+				if (entry.isDirectory())
+				{
+					createFolderNode(new FilePath(entry.getName()));
+				}
+				else
+				{
+					createFileNode(new FilePath(entry.getName()));
+				}
+				entry = m_zipInput.getNextEntry();
 			}
 		}
 		catch (IOException e)
 		{
 			throw new FileSystemException(e);
 		}
-	}
-
-	@Override
-	public List<String> ls() throws FileSystemException
-	{
-		if (m_zipInput == null)
-		{
-			throw new FileSystemException("File system is not open");
-		}
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<String> ls(String path) throws FileSystemException
-	{
-		if (m_zipInput == null)
-		{
-			throw new FileSystemException("File system is not open");
-		}
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isDirectory(String path) throws FileSystemException
-	{
-		if (m_zipInput == null)
-		{
-			throw new FileSystemException("File system is not open");
-		}
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isFile(String path) throws FileSystemException
-	{
-		if (m_zipInput == null)
-		{
-			throw new FileSystemException("File system is not open");
-		}
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	@Override
@@ -142,41 +98,14 @@ public class ReadZipFile implements FileSystem
 	@Override
 	public InputStream readFrom(String filename) throws FileSystemException
 	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void chdir(String path) throws FileSystemException
-	{
-		if (m_zipInput == null)
+		try
 		{
-			throw new FileSystemException("File system is not open");
+			getZipEntry(filename);
+			return m_zipInput;
 		}
-		m_dirStack.push(m_currentDir);
-		m_currentDir = m_currentDir.chdir(path);
-	}
-	
-	@Override
-	public void pushd(String path) throws FileSystemException
-	{
-		chdir(path);
-	}
-	
-	@Override
-	public void popd() throws FileSystemException
-	{
-		if (m_zipInput == null)
+		catch (IOException e)
 		{
-			throw new FileSystemException("File system is not open");
-		}
-		if (m_dirStack.isEmpty())
-		{
-			m_currentDir = new FilePath("");
-		}
-		else
-		{
-			m_currentDir = m_dirStack.pop();
+			throw new FileSystemException(e);
 		}
 	}
 
@@ -199,14 +128,9 @@ public class ReadZipFile implements FileSystem
 	}
 
 	@Override
-	public String pwd()
-	{
-		return m_currentDir.toString();
-	}
-
-	@Override
 	public void close() throws FileSystemException
 	{
+		super.close();
 		try
 		{
 			m_zipInput.close();
@@ -217,15 +141,14 @@ public class ReadZipFile implements FileSystem
 		}
 	}
 	
-	protected List<String> filterResourceListing(String path)
-	{
-		for (ZipEntrySummary zes : m_zipContents)
-		{
-			
-		}
-		return null;
-	}
-	
+	/**
+	 * Gets the zip entry corresponding to a given path. This method has the
+	 * side effect of placing the pointer of the zip input stream at the location
+	 * of the desired file.
+	 * @param path The path to get the entry for
+	 * @return The zip entry
+	 * @throws IOException Thrown if resetting the input stream fails
+	 */
 	protected ZipEntry getZipEntry(String path) throws IOException
 	{
 		m_input.reset();
@@ -238,50 +161,8 @@ public class ReadZipFile implements FileSystem
 			{
 				return ze;
 			}
+			ze = m_zipInput.getNextEntry();
 		}
 		return null;
-	}
-	
-	protected static class ZipEntrySummary
-	{
-		/**
-		 * The path of the zip entry
-		 */
-		protected Path m_path;
-		
-		/**
-		 * A flag indicating whether the entry represents a directory within the
-		 * zip file.
-		 */
-		protected boolean m_isDirectory;
-		
-		/**
-		 * Creates a new zip entry summary.
-		 * @param ze The zip entry of which this object is a summary
-		 */
-		public ZipEntrySummary(ZipEntry ze)
-		{
-			super();
-			m_path = Path.of(ze.getName());
-			m_isDirectory = ze.isDirectory();
-		}
-		
-		/**
-		 * Determines if the zip entry is a directory.
-		 * @return <tt>true</tt> if it is a directory, <tt>false</tt> otherwise
-		 */
-		/*@ pure @*/ public boolean isDirectory()
-		{
-			return m_isDirectory;
-		}
-		
-		/**
-		 * Gets the path of the zip entry.
-		 * @return The path
-		 */
-		/*@ pure non_null @*/ public Path getPath()
-		{
-			return m_path;
-		}
 	}
 }

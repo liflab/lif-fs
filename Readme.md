@@ -26,8 +26,30 @@ Multiple uses. One can pass to an object a `FileSystem` instance where...
 - all write operations are forbidden or do nothing; this ensures that the object has read-only access to the resources
 - only a subset of the underlying files that are actually available is made visible, thereby enforcing a form of access control
 
-Write files to a zip that is uploaded by FTP
---------------------------------------------
+Examples
+--------
+
+Here are some examples of the tasks that you can do by mixing together various instances of the `FileSystem` interface.
+
+### Give read-only access to a folder of the local machine
+
+In this example, a folder of the local machine is exposed as a root of some file system object. This file system is then passed to the `ReadOnlyFileSystem` object that disables all write access to the underlying file system.
+
+```java
+// Open file system
+FileSystem fs = new ReadOnlyFileSystem(new HardDisk("/path/to/folder"));
+
+// Change to folder; internally resolves to /path/to/folder/foo
+fs.chdir("/foo");
+
+// Read contents of a file: OK
+byte[] contents = FileUtils.toBytes(fs.readFrom("bar.txt"));
+
+// Try to write contents: throws an exception
+OutputStream os = fs.writeTo("baz/somefile.txt");
+```
+
+### Write files to a zip that is uploaded by FTP
 
 This example shows that a file system can be given a stream from another file system instance.
 
@@ -73,8 +95,7 @@ ftp.close();
 
 Note how the `WriteZipFile` object has no idea it is writing its contents into a stream that comes from an FTP file system.
 
-Read and write files as local database entries
-----------------------------------------------
+### Read and write files as local database entries
 
 This example shows that the `JdbcFileSystem` object stores files as entries in a table. A column called "name" contains the filename, and a column called "content" contains a BLOB with the contents of the file. Users of the `JdbcFileSystem` are given access to these files as if they were stored in a hierarchical file system.
 
@@ -99,8 +120,7 @@ s.close();
 db.close();
 ```
 
-Recursively dump an FTP folder to the local file system
--------------------------------------------------------
+### Recursively dump an FTP folder to the local file system
 
 ```java
 // Open a file system to some local folder
