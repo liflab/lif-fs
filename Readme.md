@@ -6,17 +6,17 @@ A `FileSystem` object provides a handful of methods for manipulating files:
 - `rm` deletes a file
 - `mkdir` and `rmdir` respectively create and delete a folder.
 - `ls` lists the contents of a folder.
-- `chdir` changes the current directory. All operations are performed relatively to this current directory.
+- `chdir` changes the current directory. All operations are performed relatively to this current directory. Commands `pushd` and `popd` allow a stack of current directories to be pushed/popped.
 
-This interface abstracts away the actual *physical* location of the files being manipulated, as well as the specific *means* by which these files are stored. A consumer of a `FileSystem` object needs not be aware that the underlying file system is concretely stored as...
+This interface abstracts away the actual *physical* location of the files being manipulated, as well as the specific *means* by which these files are stored and accessed. A consumer of a `FileSystem` object needs not be aware that the underlying file system is concretely stored as...
 
-- a local drive
-- an FTP connection
-- a zip file
-- a temporary folder
+- a local drive (`HardDisk`)
+- an FTP connection (`FtpConnection`)
+- a zip file (`ReadZipFile`, `WriteZipFile`)
+- a temporary folder (`TempFolder`)
 - a tar archive
 - a database table
-- a ramdisk
+- a ramdisk (`RamDisk`)
 - a Java `properties` file
 - a set of WebDAV resources
 
@@ -121,6 +121,8 @@ db.close();
 ```
 
 ### Recursively dump an FTP folder to the local file system
+
+This example makes use of the `FileUtils` utility class, whose `copy()` method can be used to transfer all files and folders of a file system object to another one.
 
 ```java
 // Open a file system to some local folder
