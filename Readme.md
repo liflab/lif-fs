@@ -13,6 +13,8 @@ The *lif-fs* library defines an interface called `FileSystem` that exposes files
 - `ls` lists the contents of a folder
 - `chdir` changes the current directory; `pushd` and `popd` allow a stack of current directories to be pushed/popped
 
+See the [API documentation](https://liflab.github.io/lif-fs/javadoc) for full details.
+
 Usage
 -----
 
