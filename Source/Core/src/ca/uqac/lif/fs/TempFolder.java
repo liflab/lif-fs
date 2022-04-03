@@ -42,12 +42,19 @@ public class TempFolder extends HardDisk
 	
 	/**
 	 * Creates a new temporary file system.
+	 * @throws IOException Thrown if the folder could not be created
 	 */
 	public TempFolder() throws IOException
 	{
 		this("");
 	}
 	
+	/**
+	 * Creates a new temporary file system, giving a prefix to the created
+	 * folder.
+	 * @param prefix The prefix
+	 * @throws IOException Thrown if the folder could not be created
+	 */
 	public TempFolder(String prefix) throws IOException
 	{
 		super(Files.createTempDirectory(prefix).toString());

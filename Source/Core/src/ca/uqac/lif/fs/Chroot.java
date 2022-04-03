@@ -120,6 +120,8 @@ public class Chroot extends FilterFileSystem
 	 * Gets the absolute path corresponding to a path within the file system
 	 * @param path The path
 	 * @return The absolute path on the local machine
+	 * @throws FileSystemException Thrown if the current directory could not be
+	 * obtained
 	 */
 	protected String getPath(String path) throws FileSystemException
 	{

@@ -314,6 +314,7 @@ public class RamDisk implements FileSystem
 	/**
 	 * Creates a new file node corresponding to a path. 
 	 * @param fp The path
+	 * @return The internal node
 	 * @throws FileSystemException Thrown if the path cannot be created
 	 */
 	protected RamdiskFileNode createFileNode(FilePath fp) throws FileSystemException
@@ -375,6 +376,9 @@ public class RamDisk implements FileSystem
 		return m_currentDir.toString();
 	}
 
+	/**
+	 * A node in the ramdisk directory structure.
+	 */
 	protected static abstract class RamdiskNode
 	{
 		protected RamdiskNode m_parent;
@@ -435,6 +439,9 @@ public class RamDisk implements FileSystem
 		}
 	}
 
+	/**
+	 * A node in the ramdisk directory structure representing a folder.
+	 */
 	protected static class RamdiskFolderNode extends RamdiskNode
 	{
 		public RamdiskFolderNode(String name)
@@ -449,6 +456,9 @@ public class RamDisk implements FileSystem
 		}
 	}
 
+	/**
+	 * A node in the ramdisk directory structure representing a file.
+	 */
 	protected static class RamdiskFileNode extends RamdiskNode
 	{
 		/**
@@ -468,6 +478,9 @@ public class RamDisk implements FileSystem
 		}
 	}
 
+	/**
+	 * An output stream connected to a ramdisk file node.
+	 */
 	protected class RamdiskFileOutputStream extends OutputStream
 	{
 		protected ByteArrayOutputStream m_contents;

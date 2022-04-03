@@ -17,6 +17,12 @@
  */
 package ca.uqac.lif.fs;
 
+/**
+ * An object that explores the file and directory structure of a file system,
+ * and calls a special method {@link #visit(FilePath)} on each element.
+ * @author Sylvain Hallé
+ *
+ */
 public abstract class FileSystemVisitor
 {
 	/**

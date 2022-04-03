@@ -22,8 +22,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+/**
+ * A set of static methods for common operations on files and file systems.
+ * @author Sylvain Hallé
+ */
 public class FileUtils
 {
 	/**
@@ -34,10 +39,27 @@ public class FileUtils
 		super();
 	}
 	
+	/**
+	 * Filters the files of a directory listing according to a filename pattern.
+	 * @param fs The file system to list
+	 * @param path The path in the file system to list
+	 * @param pattern The filename pattern, expressed as a regular expression
+	 * @return The list of files matching the pattern
+	 * @throws FileSystemException Thrown if the operation could not
+	 * proceed
+	 */
 	public static List<String> ls(FileSystem fs, String path, String pattern) throws FileSystemException
 	{
 		List<String> listing = fs.ls(path);
-		
+		Iterator<String> it = listing.iterator();
+		while (it.hasNext())
+		{
+			String file = it.next();
+			if (!file.matches(pattern))
+			{
+				it.remove();
+			}
+		}
 		return listing;
 	}
 	
@@ -143,10 +165,21 @@ public class FileUtils
 		return ts.getSize();
 	}
 	
+	/**
+	 * Visitor calculating the total size of all files inside a folder and its
+	 * sub-folders.
+	 */
 	protected static class TotalSize extends RecursiveListing
 	{
+		/**
+		 * The total size of all visited files.
+		 */
 		protected long m_totalSize;
-		
+
+		/**
+		 * Creates a new visitor.
+		 * @param fs The file system to visit
+		 */
 		public TotalSize(FileSystem fs)
 		{
 			super(fs);
@@ -159,6 +192,10 @@ public class FileUtils
 			m_totalSize += m_fs.getSize(filename.toString());
 		}
 		
+		/**
+		 * Gets the total size of all visited files.
+		 * @return The size, in bytes
+		 */
 		public long getSize()
 		{
 			return m_totalSize;

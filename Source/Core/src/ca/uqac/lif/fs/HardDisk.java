@@ -38,7 +38,7 @@ import java.util.stream.Stream;
  * hard drive. Optionally, the class can be given a folder name, which
  * will be taken as the root of the file system exposed to the user. In such a
  * way, {@link HardDisk} can perform an operation similar to
- * <a href=""><tt>chroot</tt></a>
+ * <a href="https://en.wikipedia.org/wiki/Chroot"><tt>chroot</tt></a>
  * @author Sylvain Hallé
  */
 public class HardDisk implements FileSystem

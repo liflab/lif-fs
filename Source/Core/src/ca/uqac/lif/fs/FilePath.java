@@ -60,7 +60,7 @@ public class FilePath
 	/**
 	 * Creates a file path from a list of path elements.
 	 * @param parts The list of path elements
-	 * 
+	 * @param is_absolute A flag indicating if the path is an absolute one
 	 */
 	public FilePath(List<String> parts, boolean is_absolute)
 	{

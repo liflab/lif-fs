@@ -425,7 +425,7 @@ public class FtpConnection implements FileSystem
 
 		/**
 		 * Creates a new FTP input stream.
-		 * @param out_stream The underlying output stream
+		 * @param in_stream The underlying input stream
 		 */
 		public FtpInputStream(InputStream in_stream)
 		{

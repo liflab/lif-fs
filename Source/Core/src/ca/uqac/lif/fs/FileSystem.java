@@ -30,7 +30,22 @@ public interface FileSystem
 	/**
 	 * Enumeration representing the three possible states of a file system.
 	 */
-	public enum OpenState {UNINITIALIZED, OPEN, CLOSED}
+	public enum OpenState {
+		/**
+		 * State of the file system before a call to {@link #open()}.
+		 */
+		UNINITIALIZED,
+		
+		/**
+		 * State of the file system after a call to {@link #open()} and before a
+		 * call to {@link #close()}.
+		 */
+		OPEN,
+		
+		/**
+		 * State of the file system after a call to {@link #close()}.
+		 */
+		CLOSED}
 	
 	/**
 	 * Starts the interaction with the file system. All operations invoked on

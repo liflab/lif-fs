@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<body>
+<p>Java provides various ways to access and manipulate files; however, depending on where these files are located, they are exposed through different classes and methods. If the files are on a local folder, they are accessed using the <tt>File</tt> class and its associated methods; if they are inside a zip file, the <tt>ZipInputStream</tt> and <tt>ZipOutputStream</tt> objects must be used according to a completely different workflow; if the same files are accessible over an FTP connection, yet other objects and methods are required.</p>
+
+<p>The <i>lif-fs</i> library defines an interface called <tt>FileSystem</tt> that exposes files through a simple and <strong>uniform</strong> set of methods:</p>
+
+<ul>
+<li><tt>open</tt> and <tt>close</tt> start and end the interaction with the file system</li>
+<li><tt>writeTo</tt> is given a filename and returns an <tt>OutputStream</tt> to which data can be written</li>
+<li><tt>readFrom</tt> is given a filename and returns an <tt>InputStream</tt> from which data can be read</li>
+<li><tt>rm</tt> deletes a file</li>
+<li><tt>mkdir</tt> and <tt>rmdir</tt> respectively create and delete a folder</li>
+<li><tt>ls</tt> lists the contents of a folder</li>
+<li><tt>chdir</tt> changes the current directory; <tt>pushd</tt> and <tt>popd</tt> allow a stack of current directories to be pushed/popped
+</ul>
+</body>
+</html>
