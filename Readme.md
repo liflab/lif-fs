@@ -1,28 +1,51 @@
+A library for abstract file system operations
+=============================================
+
 Java provides various ways to access and manipulate files; however, depending on where these files are located, they are exposed through different classes and methods. If the files are on a local folder, they are accessed using the `File` class and its associated methods; if they are inside a zip file, the `ZipInputStream` and `ZipOutputStream` objects must be used according to a completely different workflow; if the same files are accessible over an FTP connection, yet other objects and methods are required.
 
 The *lif-fs* library defines an interface called `FileSystem` that exposes files through a simple and **uniform** set of methods:
 
-- `open` and `close` start and end the interaction with the file system. Any other operation is invalid if invoked before `open` or after `close`.
-- `writeTo` is given a filename and returns an `OutputStream` to which data can be written. Closing the stream causes the file to be written.
-- `readFrom` is given a filename and returns an `InputStream` from which data can be read.
+- `open` and `close` start and end the interaction with the file system
+- `writeTo` is given a filename and returns an `OutputStream` to which data can be written
+- `readFrom` is given a filename and returns an `InputStream` from which data can be read
 - `rm` deletes a file
-- `mkdir` and `rmdir` respectively create and delete a folder.
-- `ls` lists the contents of a folder.
-- `chdir` changes the current directory. All operations are performed relatively to this current directory. Commands `pushd` and `popd` allow a stack of current directories to be pushed/popped.
+- `mkdir` and `rmdir` respectively create and delete a folder
+- `ls` lists the contents of a folder
+- `chdir` changes the current directory; `pushd` and `popd` allow a stack of current directories to be pushed/popped
 
-This interface abstracts away the actual *physical* location of the files being manipulated, as well as the specific *means* by which these files are stored and accessed. A consumer of a `FileSystem` object needs not be aware that the underlying file system is concretely stored as...
+Usage
+-----
 
-- a local drive (`HardDisk`)
-- an FTP connection (`FtpConnection`)
-- a zip file (`ReadZipFile`, `WriteZipFile`)
-- a temporary folder (`TempFolder`)
-- a tar archive
-- a database table
-- a ramdisk (`RamDisk`)
-- a Java `properties` file
-- a set of WebDAV resources
+### Abstract access to resources
 
-As another interesting side effect, many file system objects of the library take as input another file system instance, or a stream from another file system instance. In this way, they can alter the way in which the resources of the underlying file system are accessed.
+It is possible to pass a `FileSystem` instance to a method or an object. Consider the following method from some arbitrary class:
+
+```java
+public void doSomething(FileSystem fs) {
+  FileUtils.copy(FileUtils.asBytes("Hello"), fs.writeTo("/foo.txt"));
+}
+```
+
+We can see that this method writes the string "Hello" to some file called "foo.txt" in the root folder of `fs`. However, the method does not care where this file system resides, or how the file is actually stored. Depending on what `FileSystem` object is being passed, the file could be concretely stored as...
+
+- a file on some folder of a local drive (`HardDisk`)
+- a file sent over an FTP connection (`FtpConnection`)
+- a file written into the contents of a zip file being created (`ReadZipFile`, `WriteZipFile`)
+- a file written to a temporary folder (`TempFolder`), or an in-memory file system (`RamDisk`)
+- nothing at all (`NoopFileSystem`)
+- etc.
+
+### Testing
+
+This can be useful for **testing** purposes: for instance, a test case can pass a `RamDisk` instance to a system under test and examine what the system writes to it, instead of having it write files for real on the local machine. Similarly, testing a program that accesses files over a network no longer needs a setup to simulate the connection: if it accesses these files through a `FileSystem` object, any other file system can be passed instead of an `FtpConnection` at testing time (the file system can even be artificially throttled using the `ThrottledFileSystem` to simulate transfer speed). If the contents of the files being written is not necessary for the test, one can even pass the `NoopFileSystem` that writes nothing.
+
+### Access control
+
+As another interesting side effect, many file system objects of the library take as input another file system instance, or a stream from another file system instance. In this way, they can alter the way in which the resources of the underlying file system are accessed: modifying file contents or filenames, preventing access to some files, etc. For example, the `ReadOnlyFileSystem` disables all write access to the underlying file system. Passing this file system to an object ensures it will not succeed at writing into the target file system. One can also choose to expose only a folder of a file system as the root of some other file system, using the `Chroot` file system. The consumer of this object operates on that file system without being aware it is contained within another one.
+
+### Customization
+
+If the available file systems do not suit your needs, users are free to write their own. The `FilterFileSystem` class is useful for that purpose, as it delegates all its operations to another file system instance; descendants of this class may elect to override some of these methods to perform different operations. See the examples below for some cases of custom file systems.
 
 Examples
 --------
@@ -81,7 +104,35 @@ zip.close();
 ftp.close();
 ```
 
-In this example, it is worth noting that no file transfer is explicitly done. The transfer of the zip file is implicitly executed on the call to `zip.open()`. Also worthy of mention is the fact that `zip.ls` fetches an in-memory cache of the archive's directory, and does not require the file to be tranferred multiple times.
+In this example, it is worth noting that no file transfer is explicitly done. The transfer of the zip file is implicitly executed on the call to `zip.open()`. Also worthy of mention is the fact that `zip.ls()` fetches an in-memory cache of the archive's directory, and does not require the file to be tranferred multiple times.
+
+### Mirror file operations on multiple systems
+
+The `Mirror` file system replicates all its actions on any number of file systems. In the following example, we create a mirror file system where all write operations cause files to be written both to a local folder, and sent over an FTP connection to some remote location. A single call to `writeTo` creates the same file in both places.
+
+```java
+FileSystem mirror = new Mirror(
+  new FtpConnection("10.1.2.3", "user", "pass"),
+  new HardDisk("/path/to/my/folder")
+);
+mirror.open();
+FileUtils.copy(FileUtils.asBytes("Hello"), mirror.writeTo("/blabla.txt"));
+mirror.close();
+```
+
+An interesting side effect of `Mirror` is what it does on read operations: when a folder or a file is accessed, it queries each of its underlying file systems until one of them finds it. As a result, when used in read mode, `Mirror` "merges" multiple directory structures into one:
+
+```java
+FileSystem mirror = new Mirror(
+  new FtpConnection("10.1.2.3", "user", "pass"),
+  new HardDisk("/path/to/my/folder")
+);
+mirror.open();
+byte[] contents = FileUtils.getBytes(mirror.readFrom("foobar.bin"));
+mirror.close();
+```
+
+In this example, the consumer of `mirror` does not know if "foobar.bin" has been read from the local drive or retrieved from the FTP connection.
 
 ### Write files to a zip that is uploaded by FTP
 
@@ -191,3 +242,27 @@ hd.open();
 // Try to copy a big file into the floppy
 FileUtils.copy(hd.readFrom("bigfile.bin"), floppy.writeTo("bigfile.bin"));
 ```
+
+### Write a custom file system
+
+This example shows how one can write a custom file system with a specific behavior. Here, the class `MyFileSystem` descends from `FilterFileSystem`, which delegates operations to another file system instance. We override method `readFrom` so that a count of the number of accessed files is kept, and read access is not granted once the number of accesses reaches 10.
+
+```java
+class MyFileSystem extends FilterFileSystem {
+
+  int filesRead = 0;
+  
+  public MyFileSystem(FileSystem fs) {
+    super(fs);
+  }
+  
+  public InputStream readFrom(String filename) throws FileSystemException {
+    if (++filesRead > 10) {
+      throw new FileSystemException("Maximum number of files reached");
+    }
+    return super.readFrom(filename);
+  }
+}
+```
+
+One could imagine custom file systems performing various operations: enforcing access control rules based on the files that have been read in the past (Chinese wall policy), associate files with security levels and prevent read or write access depending on the level of the current user (Bell-LaPadula), etc.
