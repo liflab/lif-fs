@@ -123,6 +123,18 @@ public class RamDisk implements FileSystem
 		RamdiskNode rn = locate(fp);
 		return rn instanceof RamdiskFileNode;
 	}
+	
+	@Override
+	public long getSize(String path) throws FileSystemException
+	{
+		FilePath fp = m_currentDir.chdir(path);
+		RamdiskNode rn = locate(fp);
+		if (!(rn instanceof RamdiskFileNode))
+		{
+			throw new FileSystemException("Path is a directory");
+		}
+		return ((RamdiskFileNode) rn).m_contents.length;
+	}
 
 	@Override
 	public OutputStream writeTo(String filename) throws FileSystemException

@@ -53,6 +53,12 @@ public class FilterFileSystem implements FileSystem
 	{
 		m_fs.open();
 	}
+	
+	@Override
+	public long getSize(String path) throws FileSystemException
+	{
+		return m_fs.getSize(path);
+	}
 
 	@Override
 	public List<String> ls() throws FileSystemException

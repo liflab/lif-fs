@@ -88,6 +88,12 @@ public class WriteZipFile implements FileSystem
 	{
 		throw new FileSystemException("File system is open in write mode");
 	}
+	
+	@Override
+	public long getSize(String filename) throws FileSystemException
+	{
+		throw new FileSystemException("File system is open in write mode");
+	}
 
 	@Override
 	public void chdir(String path) throws FileSystemException

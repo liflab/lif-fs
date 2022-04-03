@@ -124,4 +124,45 @@ public class FileUtils
 			to.popd();
 		}
 	}
+	
+	/**
+	 * Gets the size of a folder, including that of all its files and
+	 * sub-folders.
+	 * @param fs The file system
+	 * @param path The folder
+	 * @return The size of the folder, in bytes
+	 * @throws FileSystemException Thrown if the copying process could not
+	 * proceed for some reason
+	 */
+	public static long getSize(FileSystem fs, String path) throws FileSystemException
+	{
+		fs.pushd(path);
+		TotalSize ts = new TotalSize(fs);
+		ts.crawl();
+		fs.popd();
+		return ts.getSize();
+	}
+	
+	protected static class TotalSize extends RecursiveListing
+	{
+		protected long m_totalSize;
+		
+		public TotalSize(FileSystem fs)
+		{
+			super(fs);
+			m_totalSize = 0;
+		}
+
+		@Override
+		protected void visit(FilePath filename) throws FileSystemException
+		{
+			m_totalSize += m_fs.getSize(filename.toString());
+		}
+		
+		public long getSize()
+		{
+			return m_totalSize;
+		}
+		
+	}
 }

@@ -184,6 +184,36 @@ public class JarFile implements FileSystem
 			throw new FileSystemException(e);
 		}
 	}
+	
+	@Override
+	public long getSize(String path) throws FileSystemException
+	{
+		FilePath filename = m_currentDir.chdir(path);
+		String s_filename = filename.toString();
+		if (s_filename.startsWith(FilePath.SLASH))
+		{
+			s_filename = s_filename.substring(1);
+		}
+		URL u = m_referenceClass.getResource(s_filename);
+		if (u == null)
+		{
+			throw new FileSystemException("File does not exist");
+		}
+		try
+		{
+			URI uri = u.toURI();
+			if (uri == null)
+			{
+				throw new FileSystemException("File does not exist");
+			}
+			File f = new File(uri);
+			return f.length();
+		}
+		catch (URISyntaxException e)
+		{
+			throw new FileSystemException(e);
+		}
+	}
 
 	@Override
 	public OutputStream writeTo(String filename) throws FileSystemException

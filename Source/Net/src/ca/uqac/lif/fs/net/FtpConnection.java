@@ -240,6 +240,25 @@ public class FtpConnection implements FileSystem
 			throw new FileSystemException(e);
 		}
 	}
+	
+	@Override
+	public long getSize(String path) throws FileSystemException
+	{
+		FilePath fp = m_currentDir.chdir(path);
+		try
+		{
+			FTPFile f = m_client.mlistFile(fp.toString());
+			if (f == null)
+			{
+				throw new FileSystemException("File does not exist");
+			}
+			return f.getSize();
+		}
+		catch (IOException e)
+		{
+			throw new FileSystemException(e);
+		}
+	}
 
 	@Override
 	public OutputStream writeTo(String filename) throws FileSystemException

@@ -277,6 +277,20 @@ public class HardDisk implements FileSystem
 		Path p = getPath(path);
 		return Files.exists(p) && !Files.isDirectory(p);
 	}
+	
+	@Override
+	public long getSize(String path) throws FileSystemException
+	{
+		Path p = getPath(path);
+		try
+		{
+			return Files.size(p);
+		}
+		catch (IOException e)
+		{
+			throw new FileSystemException(e);
+		}
+	}
 
 	@Override
 	public void delete(String path) throws FileSystemException

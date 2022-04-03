@@ -25,29 +25,62 @@ package ca.uqac.lif.fs;
  * 
  * @author Sylvain Hallé
  */
-public class FloppyDisk extends HardDisk
+public class FloppyDisk extends ThrottledFileSystem
 {
-	public enum Size {F_360, F_720}
-	
 	/**
-	 * The maximum size of the file system, in bytes.
+	 * Enumeration of possible floppy types.
+	 * <ul>
+	 * <li><tt>F_360</tt>: a 360 kb 5¼" floppy</li>
+	 * <li><tt>F_720</tt>: a 720 kb 3½" floppy</li>
+	 * </ul>
 	 */
-	protected int m_maxSize;
-	
+	public enum FloppyType {F_360, F_720}
+
 	/**
 	 * Creates a new empty floppy disk of given size.
-	 * @param root The root folder 
-	 * @param s
+	 * @param fs The underlying file system to expose as a floppy
+	 * @param s The type of floppy
 	 */
-	public FloppyDisk(String root, Size s)
+	public FloppyDisk(FileSystem fs, FloppyType s)
 	{
-		super(root);
-		switch (s)
+		super(fs);
+		setSizeLimit(getMaxSize(s));
+		setSpeedLimit(getMaxSpeed(s));
+	}
+
+	/**
+	 * Gets the maximum transfer speed of the drive.
+	 * @param floppy_type The floppy type
+	 * @return The speed, in bytes per second
+	 */
+	protected long getMaxSpeed(FloppyType floppy_type)
+	{
+		switch (floppy_type)
 		{
 		case F_360:
-			m_maxSize = 360;
+			return 21000;
 		case F_720:
-			m_maxSize = 720;
+			return 33000;
+		default:
+			return 33000;
+		}
+	}
+	
+	/**
+	 * Gets the maximum size of the drive.
+	 * @param floppy_type The floppy type
+	 * @return The size, in bytes
+	 */
+	protected long getMaxSize(FloppyType floppy_type)
+	{
+		switch (floppy_type)
+		{
+		case F_360:
+			return 360000;
+		case F_720:
+			return 720000;
+		default:
+			return 0;
 		}
 	}
 }

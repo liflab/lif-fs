@@ -81,6 +81,15 @@ public interface FileSystem
 	public boolean isFile(String path) throws FileSystemException;
 	
 	/**
+	 * Gets the size of a file.
+	 * @param path The path corresponding to the file
+	 * @return The size in bytes
+	 * @throws FileSystemException Thrown if the operation could not be performed
+	 * for some reason
+	 */
+	public long getSize(String path) throws FileSystemException;
+	
+	/**
 	 * Writes data to a file. The method provides an {@link OutputStream} to
 	 * which data can be printed. The data is guaranteed to be committed to the
 	 * file only when the print stream is closed. Whether data is written before
