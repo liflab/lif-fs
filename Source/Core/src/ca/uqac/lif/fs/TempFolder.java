@@ -75,14 +75,6 @@ public class TempFolder extends HardDisk
 	public void open() throws FileSystemException
 	{
 		super.open();
-		try
-		{
-			m_root = new FilePath(Files.createTempDirectory(m_prefix).toString());
-		}
-		catch (IOException e)
-		{
-			throw new FileSystemException(e);
-		}
 	}
 	
 	@Override

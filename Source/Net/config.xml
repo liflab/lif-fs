@@ -19,11 +19,11 @@
   you might need to run "ant clean" and start over.
 -->
 <build>
-  <!-- Uncomment any of these if you want to override the build
+  <!-- Uncomment any of these if you want to override the build     
        script's default values -->
 
   <!-- The project's name -->
-  <name>lif-fs FTP</name>
+  <name>lif-fs Net</name>
   
   <!-- The project's version number -->
   <version>0.1-alpha</version>
@@ -48,7 +48,7 @@
   
   <!-- Output jar -->
   <jar>
-    <filename>../lif-fs-core.jar</filename>
+    <filename>../lif-fs-net.jar</filename>
     <withdoc>false</withdoc>
     <withdeps>true</withdeps>
   </jar>
@@ -82,6 +82,7 @@
       </files>
       <bundle>false</bundle> <!-- only used for testing -->
     </dependency>
+    <!--
     <dependency>
       <name>Sardine WebDAV client</name>
       <classname>com.github.sardine.Sardine</classname>
@@ -90,7 +91,7 @@
       </files>
       <bundle>true</bundle>
     </dependency>
-    <dependency> <!-- Sardine dependency -->
+    <dependency>
       <name>Jakarta XML Binding API</name>
       <classname>com.github.sardine.Sardine</classname>
       <files>
@@ -98,5 +99,6 @@
       </files>
       <bundle>true</bundle>
     </dependency>
+    -->
   </dependencies>
 </build>

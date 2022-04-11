@@ -28,6 +28,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -315,9 +316,9 @@ public class HardDisk implements FileSystem
 		FilePath fp = m_currentDir.chdir(path);
 		if (fp.isAbsolute())
 		{
-			return Path.of(m_root.toString() + fp.toString());
+			return Paths.get(m_root.toString() + fp.toString());
 		}
-		return Path.of(m_root.toString() + SLASH + fp.toString());
+		return Paths.get(m_root.toString() + SLASH + fp.toString());
 	}
 	
 	protected static void deleteDirectoryRecursion(Path path) throws IOException 

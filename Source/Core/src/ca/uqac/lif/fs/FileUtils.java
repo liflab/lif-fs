@@ -17,6 +17,7 @@
  */
 package ca.uqac.lif.fs;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -163,6 +164,27 @@ public class FileUtils
 		ts.crawl();
 		fs.popd();
 		return ts.getSize();
+	}
+	
+	/**
+	 * Makes an array of bytes accessible though an input stream.
+	 * @param bytes The array of bytes
+	 * @return An input stream open on this array of bytes
+	 */
+	public static InputStream toStream(byte[] bytes)
+	{
+		return new ByteArrayInputStream(bytes);
+	}
+	
+	/**
+	 * Makes a string accessible though an input stream.
+	 * @param bytes The string
+	 * @return An input stream open on the array of bytes corresponding to the
+	 * string
+	 */
+	public static InputStream toStream(String s)
+	{
+		return new ByteArrayInputStream(s.getBytes());
 	}
 	
 	/**

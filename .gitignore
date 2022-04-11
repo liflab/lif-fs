@@ -37,6 +37,7 @@ jacoco.exec
 .metadata
 **/*.class
 **/bin
+**/bintest
 **/tmp
 **/*~.nib
 **/local.properties

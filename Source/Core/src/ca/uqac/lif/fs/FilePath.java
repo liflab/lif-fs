@@ -18,6 +18,7 @@
 package ca.uqac.lif.fs;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,7 +134,7 @@ public class FilePath
 	 */
 	/*@ pure non_null @*/ public Path asPath()
 	{
-		return Path.of(toString());
+		return Paths.get(toString());
 	}
 	
 	@Override

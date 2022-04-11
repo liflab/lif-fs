@@ -28,7 +28,7 @@
     <!-- Compile core -->
     <ant dir="Core" target="jar" />
     <!-- Copy core to other projects -->
-    <copy file="petitpoucet-core.jar" todir="Net/lib" />
+    <copy file="lif-fs-core.jar" todir="Net/lib" />
     <!-- Compile Net -->
     <ant dir="Net" target="jar" />
   </target>

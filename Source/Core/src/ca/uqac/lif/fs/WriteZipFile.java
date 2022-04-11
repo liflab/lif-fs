@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Stack;
 import java.util.zip.ZipEntry;
@@ -79,7 +80,7 @@ public class WriteZipFile implements FileSystem
 		{
 			throw new FileSystemException("File system is not open");
 		}
-		Path file_path = Path.of(m_currentDir.toString(), filename);
+		Path file_path = Paths.get(m_currentDir.toString(), filename);
 		return new ZipEntryOutputStream(file_path.toString());
 	}
 
