@@ -48,33 +48,33 @@ public class HardDisk implements FileSystem
 	 * The system-dependent carriage return symbol
 	 */
 	public static final transient String CRLF = System.getProperty("line.separator");
-	
+
 	/**
 	 * The system-dependent symbol for separating paths
 	 */
 	public static final transient String SLASH = System.getProperty("file.separator");
-	
+
 	/**
 	 * The path of the directory on the local file system that is exposed as the
 	 * "root" directory by this file system object.
 	 */
 	/*@ non_null @*/ protected FilePath m_root;
-	
+
 	/**
 	 * The path representing the current directory.
 	 */
 	protected FilePath m_currentDir;
-	
+
 	/**
 	 * A stack containing the history of current directories.
 	 */
 	protected Stack<FilePath> m_dirStack;
-	
+
 	/**
 	 * The current state of the file system.
 	 */
 	protected OpenState m_state;
-	
+
 	/**
 	 * Creates a new local file system.
 	 * @param root The folder in the underlying file system that will act as the
@@ -88,7 +88,7 @@ public class HardDisk implements FileSystem
 		m_currentDir = new FilePath("");
 		m_dirStack = new Stack<FilePath>();
 	}
-	
+
 	/**
 	 * Gets the path on the local machine corresponding to the root of the file
 	 * system.
@@ -98,7 +98,7 @@ public class HardDisk implements FileSystem
 	{
 		return m_root;
 	}
-	
+
 	@Override
 	public OutputStream writeTo(String filename) throws FileSystemException
 	{
@@ -151,13 +151,13 @@ public class HardDisk implements FileSystem
 		m_dirStack.push(m_currentDir);
 		m_currentDir = m_currentDir.chdir(path);
 	}
-	
+
 	@Override
 	public void pushd(String path) throws FileSystemException
 	{
 		chdir(path);
 	}
-	
+
 	@Override
 	public void popd() throws FileSystemException
 	{
@@ -191,7 +191,7 @@ public class HardDisk implements FileSystem
 			throw new FileSystemException(e);
 		}
 	}
-	
+
 	@Override
 	public void mkdir(String path) throws FileSystemException
 	{
@@ -199,16 +199,19 @@ public class HardDisk implements FileSystem
 		{
 			throw new FileSystemException("File system is not open");
 		}
-		try
+		if (!Files.exists(getPath(path)))
 		{
-			Files.createDirectory(getPath(path));
-		}
-		catch (IOException e)
-		{
-			throw new FileSystemException(e);
+			try
+			{
+				Files.createDirectory(getPath(path));
+			}
+			catch (IOException e)
+			{
+				throw new FileSystemException(e);
+			}
 		}
 	}
-	
+
 	@Override
 	public String pwd() throws FileSystemException
 	{
@@ -218,7 +221,7 @@ public class HardDisk implements FileSystem
 		}
 		return m_currentDir.toString();
 	}
-	
+
 	@Override
 	public void open() throws FileSystemException
 	{
@@ -278,7 +281,7 @@ public class HardDisk implements FileSystem
 		Path p = getPath(path);
 		return Files.exists(p) && !Files.isDirectory(p);
 	}
-	
+
 	@Override
 	public long getSize(String path) throws FileSystemException
 	{
@@ -305,7 +308,7 @@ public class HardDisk implements FileSystem
 			throw new FileSystemException(e);
 		}
 	}
-	
+
 	/**
 	 * Gets the absolute path corresponding to a path within the file system
 	 * @param path The path
@@ -320,19 +323,19 @@ public class HardDisk implements FileSystem
 		}
 		return Paths.get(m_root.toString() + SLASH + fp.toString());
 	}
-	
+
 	protected static void deleteDirectoryRecursion(Path path) throws IOException 
 	{
-	  if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS))
-	  {
-	    try (DirectoryStream<Path> entries = Files.newDirectoryStream(path)) 
-	    {
-	      for (Path entry : entries) 
-	      {
-	        deleteDirectoryRecursion(entry);
-	      }
-	    }
-	  }
-	  Files.delete(path);
+		if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS))
+		{
+			try (DirectoryStream<Path> entries = Files.newDirectoryStream(path)) 
+			{
+				for (Path entry : entries) 
+				{
+					deleteDirectoryRecursion(entry);
+				}
+			}
+		}
+		Files.delete(path);
 	}
 }
