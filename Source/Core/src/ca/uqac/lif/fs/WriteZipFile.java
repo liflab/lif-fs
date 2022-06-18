@@ -80,7 +80,7 @@ public class WriteZipFile implements FileSystem
 		{
 			throw new FileSystemException("File system is not open");
 		}
-		Path file_path = Paths.get(m_currentDir.toString(), filename);
+		Path file_path = Paths.get(FileUtils.trimSlash(m_currentDir.toString()), filename);
 		return new ZipEntryOutputStream(file_path.toString());
 	}
 

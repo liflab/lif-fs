@@ -104,6 +104,34 @@ public class ProxyInputStream extends InputStream
 		return m_buffer.read(b, off, len);
 	}
 	
+	@Override
+	public void mark(int m)
+	{
+		try 
+		{
+			checkState();
+		}
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		m_buffer.mark(m);
+	}
+	
+	@Override
+	public void reset() throws IOException
+	{
+		checkState();
+		m_buffer.reset();
+	}
+	
+	@Override
+	public boolean markSupported()
+	{
+		return true;
+	}
+	
 	protected void checkState() throws IOException
 	{
 		if (m_buffer == null)

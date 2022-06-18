@@ -188,6 +188,20 @@ public class FileUtils
 	}
 	
 	/**
+	 * Trims a string of its forward slash if it has one.
+	 * @param s The string
+	 * @return The trimmed string
+	 */
+	public static String trimSlash(String s)
+	{
+		if (!s.isEmpty() && s.startsWith("/"))
+		{
+			return s.substring(1);
+		}
+		return s;
+	}
+	
+	/**
 	 * Visitor calculating the total size of all files inside a folder and its
 	 * sub-folders.
 	 */

@@ -20,6 +20,8 @@ package ca.uqac.lif.fs;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -47,7 +49,7 @@ public class ReadZipFile extends RamDisk
 	/**
 	 * The input stream from which the contents of the zip file is to be read.
 	 */
-	/*@ non_null @*/ protected InputStream m_input;
+	/*@ non_null @*/ protected ProxyInputStream m_input;
 	
 	/**
 	 * Creates a new zip file system in read mode.
@@ -57,7 +59,7 @@ public class ReadZipFile extends RamDisk
 	public ReadZipFile(InputStream input)
 	{
 		super();
-		m_input = input;
+		m_input = new ProxyInputStream(input);
 	}
 	
 	@Override
@@ -100,7 +102,8 @@ public class ReadZipFile extends RamDisk
 	{
 		try
 		{
-			getZipEntry(filename);
+			Path file_path = Paths.get(FileUtils.trimSlash(m_currentDir.toString()), filename);
+			getZipEntry(file_path.toString());
 			return m_zipInput;
 		}
 		catch (IOException e)

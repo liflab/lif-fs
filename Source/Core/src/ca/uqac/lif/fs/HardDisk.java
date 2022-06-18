@@ -17,6 +17,7 @@
  */
 package ca.uqac.lif.fs;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -130,15 +131,17 @@ public class HardDisk implements FileSystem
 		Path fp_filename = getPath(filename);
 		File f = fp_filename.toFile();
 		FileInputStream fis;
+		BufferedInputStream bis;
 		try
 		{
 			fis = new FileInputStream(f);
+			bis = new BufferedInputStream(fis);
 		}
 		catch (FileNotFoundException e)
 		{
 			throw new FileSystemException(e);
 		}
-		return fis;
+		return bis;
 	}
 
 	@Override
