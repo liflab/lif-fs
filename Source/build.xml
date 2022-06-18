@@ -29,28 +29,35 @@
     <ant dir="Core" target="jar" />
     <!-- Copy core to other projects -->
     <copy file="lif-fs-core.jar" todir="Net/lib" />
+    <copy file="lif-fs-core.jar" todir="Memento/lib" />
     <!-- Compile Net -->
     <ant dir="Net" target="jar" />
+    <!-- Compile Memento -->
+    <ant dir="Memento" target="jar" />
   </target>
   
   <target name="download-deps">
     <ant dir="Core" target="download-deps" />
     <ant dir="Net" target="download-deps" />
+    <ant dir="Memento" target="download-deps" />
   </target>
   
   <target name="clean">
     <ant dir="Core" target="clean" />
     <ant dir="Net" target="clean" />
+    <ant dir="Memento" target="clean" />
   </target>
   
   <target name="test">
     <ant dir="Core" target="test" />
     <ant dir="Net" target="test" />
+    <ant dir="Memento" target="test" />
   </target>
 
   <target name="download-rt8">
     <ant dir="Core" target="download-rt8" />
     <copy file="Core/rt.jar" todir="Net" />
+    <copy file="Core/rt.jar" todir="Memento" />
   </target>
   
   <target name="javadoc">
@@ -89,6 +96,7 @@
       </classpath>
       <group title="Core" packages="ca.uqac.lif.fs:ca.uqac.lif.fs.*"/>
       <group title="Net" packages="ca.uqac.lif.fs.net:ca.uqac.lif.fs.net.*"/>
+      <group title="Memento" packages="ca.uqac.lif.fs.memento:ca.uqac.lif.fs.memento.*"/>
     </javadoc>
     <!--<copy todir="../docs/javadoc/doc-files">
       <fileset dir="Examples/src/doc-files"/>
