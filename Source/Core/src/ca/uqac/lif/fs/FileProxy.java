@@ -57,7 +57,7 @@ public class FileProxy
 	 * @throws FileSystemException
 	 */
 	public InputStream readFrom() throws FileSystemException
-	{;
+	{
 		if (!m_fileSystem.isFile(m_pathToFile))
 		{
 			throw new FileSystemException("File " + m_pathToFile + " not found");

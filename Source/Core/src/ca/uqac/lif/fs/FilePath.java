@@ -77,8 +77,16 @@ public class FilePath
 	public FilePath(String path)
 	{
 		super();
-		m_parts = simplify(fragment(path));
-		m_isAbsolute = m_parts.isEmpty() || path.startsWith(SLASH);
+		if (path.compareTo(DOT) == 0)
+		{
+			m_parts = new ArrayList<String>();
+			m_parts.add(".");
+		}
+		else
+		{
+			m_parts = simplify(fragment(path));
+		}
+		m_isAbsolute = path.isEmpty() || path.startsWith(SLASH);
 	}
 	
 	/**
