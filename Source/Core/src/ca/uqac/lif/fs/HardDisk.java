@@ -75,9 +75,24 @@ public class HardDisk implements FileSystem
 	 * The current state of the file system.
 	 */
 	protected OpenState m_state;
+	
+	/**
+	 * Creates a new local file system, using the root of the underlying file
+	 * system as its root, and setting its current directory to the current
+	 * working directory in that file system.
+	 */
+	public HardDisk()
+	{
+		super();
+		m_root = new FilePath("");
+		m_state = OpenState.UNINITIALIZED;
+		m_currentDir = new FilePath(System.getProperty("user.dir"));
+		m_dirStack = new Stack<FilePath>();
+	}
 
 	/**
-	 * Creates a new local file system.
+	 * Creates a new local file system, using an underlying file system folder
+	 * as its root.
 	 * @param root The folder in the underlying file system that will act as the
 	 * root of the created file system
 	 */

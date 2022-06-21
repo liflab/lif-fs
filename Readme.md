@@ -13,6 +13,8 @@ The *lif-fs* library defines an interface called `FileSystem` that exposes files
 - `ls` lists the contents of a folder
 - `chdir` changes the current directory; `pushd` and `popd` allow a stack of current directories to be pushed/popped
 
+In addition, the library allows the use of the [memento design pattern](https://en.wikipedia.org/wiki/Memento_pattern) to save/restore character strings or byte arrays to and from various file formats. For example, a string of bytes can be stored as a metadata field inside a JPEG image or a LibreOffice document, and retrieved on demand.
+
 See the [API documentation](https://liflab.github.io/lif-fs/javadoc) for full details.
 
 Usage
@@ -268,3 +270,27 @@ class MyFileSystem extends FilterFileSystem {
 ```
 
 One could imagine custom file systems performing various operations: enforcing access control rules based on the files that have been read in the past (Chinese wall policy), associate files with security levels and prevent read or write access depending on the level of the current user (Bell-LaPadula), etc.
+
+### Save a memento to a JPEG file
+
+The next examples illustrate the memento functionality of *lif-fs*. In this first code fragment below, a `FileProxy` is created and points to some JPEG file of an arbitrary file system. The `JpegExifMemento` class is then used to write an arbitrary character string into the `User Comment` metadata field of the JPEG file. The call on `fs.close()` causes the changes to be saved back to the file.
+
+```java
+FileSystem fs = ...; // Don't care where this comes from
+FileProxy file = new FileProxy(fs_out, "image.jpg");
+JpegExifMemento j = new JpegExifMemento(file);
+j.write("Some character string");
+fs.close();
+```
+
+That string can be retrieved by performing the reverse operation: opening the file and using the `read()` method:
+
+```java
+FileSystem fs = ...; // Same as above
+FileProxy file = new FileProxy(fs_out, "image.jpg");
+JpegExifMemento j = new JpegExifMemento(file);
+String s = j.read();
+fs.close();
+```
+
+After executing `read()`, variable `s` contains `"Some character string"`.
