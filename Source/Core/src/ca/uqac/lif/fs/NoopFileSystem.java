@@ -42,9 +42,9 @@ public class NoopFileSystem implements FileSystem
 {
 
 	@Override
-	public void open() throws FileSystemException
+	public NoopFileSystem open() throws FileSystemException
 	{
-		// Do nothing
+		return this;
 	}
 
 	@Override

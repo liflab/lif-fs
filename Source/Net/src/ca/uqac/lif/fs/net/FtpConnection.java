@@ -101,7 +101,7 @@ public class FtpConnection implements FileSystem
 	}
 
 	@Override
-	public void open() throws FileSystemException
+	public FtpConnection open() throws FileSystemException
 	{
 		if (m_client != null)
 		{
@@ -135,6 +135,7 @@ public class FtpConnection implements FileSystem
 			disconnect();
 			throw new FileSystemException(e);
 		}
+		return this;
 	}
 
 	/**

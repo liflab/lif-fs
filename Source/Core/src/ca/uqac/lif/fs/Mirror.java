@@ -52,12 +52,13 @@ public class Mirror implements FileSystem
 	}
 	
 	@Override
-	public void open() throws FileSystemException
+	public Mirror open() throws FileSystemException
 	{
 		for (FileSystem fs : m_mirrors)
 		{
 			fs.open();
 		}
+		return this;
 	}
 
 	@Override

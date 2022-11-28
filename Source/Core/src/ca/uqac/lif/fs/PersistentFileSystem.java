@@ -67,7 +67,7 @@ public abstract class PersistentFileSystem extends RamDisk
 	protected String m_filename;
 	
 	@Override
-	public void open() throws FileSystemException
+	public PersistentFileSystem open() throws FileSystemException
 	{
 		super.open();
 		InputStream is = m_fs.readFrom(m_filename);
@@ -80,6 +80,7 @@ public abstract class PersistentFileSystem extends RamDisk
 		{
 			throw new FileSystemException(e);
 		}
+		return this;
 	}
 	
 	@Override

@@ -66,13 +66,14 @@ public class JarFile implements FileSystem
 	}
 
 	@Override
-	public void open() throws FileSystemException
+	public JarFile open() throws FileSystemException
 	{
 		if (m_state == OpenState.CLOSED)
 		{
 			throw new FileSystemException("File system has already been closed");
 		}
 		m_state = OpenState.OPEN;
+		return this;
 	}
 
 	@Override

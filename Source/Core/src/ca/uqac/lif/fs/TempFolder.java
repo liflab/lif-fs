@@ -72,9 +72,10 @@ public class TempFolder extends HardDisk
 	}
 	
 	@Override
-	public void open() throws FileSystemException
+	public TempFolder open() throws FileSystemException
 	{
 		super.open();
+		return this;
 	}
 	
 	@Override

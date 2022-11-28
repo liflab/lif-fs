@@ -51,10 +51,11 @@ public interface FileSystem
 	 * Starts the interaction with the file system. All operations invoked on
 	 * a file system will throw a {@link FileSystemException} if called before
 	 * this method.
+	 * @return This file system instance
 	 * @throws FileSystemException Thrown if the interaction with the file system
 	 * cannot be started
 	 */
-	public void open() throws FileSystemException;
+	public FileSystem open() throws FileSystemException;
 	
 	/**
 	 * Lists all the files and folders in the current directory.

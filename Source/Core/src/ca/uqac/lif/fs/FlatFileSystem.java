@@ -78,7 +78,7 @@ public class FlatFileSystem extends RamDisk
 	}
 
 	@Override
-	public void open() throws FileSystemException
+	public FlatFileSystem open() throws FileSystemException
 	{
 		super.open();
 		if (m_state == OpenState.CLOSED)
@@ -86,6 +86,7 @@ public class FlatFileSystem extends RamDisk
 			throw new FileSystemException("File system has already been closed");
 		}
 		m_state = OpenState.OPEN;
+		return this;
 	}
 
 	@Override

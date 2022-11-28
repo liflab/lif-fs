@@ -63,7 +63,7 @@ public class ReadZipFile extends RamDisk
 	}
 	
 	@Override
-	public void open() throws FileSystemException
+	public ReadZipFile open() throws FileSystemException
 	{
 		super.open();
 		m_input.mark(0);
@@ -89,6 +89,7 @@ public class ReadZipFile extends RamDisk
 		{
 			throw new FileSystemException(e);
 		}
+		return this;
 	}
 
 	@Override

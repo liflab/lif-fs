@@ -49,9 +49,10 @@ public class FilterFileSystem implements FileSystem
 	}
 
 	@Override
-	public void open() throws FileSystemException
+	public FilterFileSystem open() throws FileSystemException
 	{
 		m_fs.open();
+		return this;
 	}
 	
 	@Override

@@ -68,9 +68,10 @@ public class WriteZipFile implements FileSystem
 	}
 	
 	@Override
-	public void open() throws FileSystemException
+	public WriteZipFile open() throws FileSystemException
 	{
 		m_zipOutput = new ZipOutputStream(m_output);
+		return this;
 	}
 
 	@Override

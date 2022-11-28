@@ -41,6 +41,77 @@ public class FileUtils
 	}
 	
 	/**
+	 * Writes an array of bytes into a file on a file system.
+	 * @param fs The file system to interact with
+	 * @param content The byte array to write
+	 * @param path The path of the file to write to
+	 * @throws FileSystemException Thrown if the operation could not
+	 * proceed
+	 */
+	public static void writeBytesTo(FileSystem fs, byte[] content, String path) throws FileSystemException
+	{
+		OutputStream os = fs.writeTo(path);
+		copy(toStream(content), os);
+		try
+		{
+			os.close();
+		}
+		catch (IOException e)
+		{
+			throw new FileSystemException(e);
+		}
+	}
+	
+	/**
+	 * Writes a string into a file on a file system.
+	 * @param fs The file system to interact with
+	 * @param content The byte array to write
+	 * @param path The path of the file to write to
+	 * @throws FileSystemException Thrown if the operation could not
+	 * proceed
+	 */
+	public static void writeStringTo(FileSystem fs, String content, String path) throws FileSystemException
+	{
+		writeBytesTo(fs, content.getBytes(), path);
+	}
+	
+	/**
+	 * Reads an array of bytes from a file on a file system.
+	 * @param fs The file system to interact with
+	 * @param path The path of the file to read from
+	 * @return The array of bytes
+	 * @throws FileSystemException Thrown if the operation could not
+	 * proceed
+	 */
+	public static byte[] readBytesFrom(FileSystem fs, String path) throws FileSystemException
+	{
+		InputStream is = fs.readFrom(path);
+		byte[] out = toBytes(is);
+		try
+		{
+			is.close();
+		}
+		catch (IOException e)
+		{
+			throw new FileSystemException(e);
+		}
+		return out;
+	}
+	
+	/**
+	 * Reads a character string from a file on a file system.
+	 * @param fs The file system to interact with
+	 * @param path The path of the file to read from
+	 * @return The character string
+	 * @throws FileSystemException Thrown if the operation could not
+	 * proceed
+	 */
+	public static String readStringFrom(FileSystem fs, String path) throws FileSystemException
+	{
+		return new String(readBytesFrom(fs, path));
+	}
+	
+	/**
 	 * Filters the files of a directory listing according to a filename pattern.
 	 * @param fs The file system to list
 	 * @param path The path in the file system to list
