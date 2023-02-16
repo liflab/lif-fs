@@ -44,21 +44,21 @@ public abstract class RecursiveListing extends FileSystemVisitor
 	
 	protected void crawl(FilePath path) throws FileSystemException
 	{
-		List<String> folders = new ArrayList<String>();
+		List<FilePath> folders = new ArrayList<FilePath>();
 		for (String e : m_fs.ls(path.toString()))
 		{
-			if (m_fs.isDirectory(e))
+			FilePath new_path = path.chdir(e);
+			if (m_fs.isDirectory(new_path.toString()))
 			{
-				folders.add(e);
+				folders.add(new_path);
 			}
 			else
 			{
 				visit(path.chdir(e));
 			}
 		}
-		for (String dir : folders)
+		for (FilePath subdir : folders)
 		{
-			FilePath subdir = path.chdir(dir);
 			crawl(subdir);
 		}
 	}
