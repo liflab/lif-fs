@@ -34,6 +34,9 @@
   
   <!-- The project's main class -->
   <!--<mainclass>ca.uqac.lif.petitpoucet.Main</mainclass>-->
+
+  <!-- Target version of JDK to compile for -->
+  <targetjdk>8</targetjdk>
   
   <!-- Installation folders -->
   <srcdir>src</srcdir>
@@ -52,6 +55,11 @@
     <withdoc>false</withdoc>
     <withdeps>true</withdeps>
   </jar>
+  
+  <!-- All test reports merged into one -->
+  <report>
+    <junitdir>../tests</junitdir>
+  </report>
   
   <!--
     Write JAR dependencies here.
