@@ -23,12 +23,12 @@
   xmlns:jacoco="antlib:org.jacoco.ant">
 
   <!-- The project's display name -->
-  <property name="build.name" value="lif-fs"/>
+  <property name="build.name" value="PetitPoucet"/>
   
   <!-- The author -->
   <property name="build.author" value="Sylvain Hallé"/>
   
-    <!-- The folder containing lib files for this super-script -->
+  <!-- The folder containing lib files for this super-script -->
   <property name="build.libdir" value="lib"/>
   
   <!-- Versions of various dependencies -->
@@ -42,48 +42,58 @@
     <!-- Compile core -->
     <ant dir="Core" target="jar" />
     <!-- Copy core to other projects -->
-    <copy file="lif-fs-core.jar" todir="Net/lib" />
-    <copy file="lif-fs-core.jar" todir="Memento/lib" />
-    <!-- Compile Net -->
-    <ant dir="Net" target="jar" />
-    <!-- Compile Memento -->
+    <copy todir="Memento/lib">
+      <fileset dir=".">
+        <include name="lif-fs-core*.jar"/>
+        <exclude name="*javadoc.jar"/>
+        <exclude name="*sources.jar"/>
+      </fileset>
+    </copy>
+    <copy todir="Net/lib">
+      <fileset dir=".">
+        <include name="lif-fs-core*.jar"/>
+        <exclude name="*javadoc.jar"/>
+        <exclude name="*sources.jar"/>
+      </fileset>
+    </copy>
+    <!-- Compile others -->
     <ant dir="Memento" target="jar" />
+    <ant dir="Net" target="jar" />
   </target>
   
   <target name="download-deps">
-    <ant dir="Core" target="download-deps" />
-    <ant dir="Net" target="download-deps" />
-    <ant dir="Memento" target="download-deps" />
-  </target>
-  
-  <target name="clean">
-    <delete dir="tests"/>
-    <delete dir="coverage"/>
-    <ant dir="Core" target="clean" />
-    <ant dir="Net" target="clean" />
-    <ant dir="Memento" target="clean" />
+    <ant dir="Core" usenativebasedir="true" target="download-deps" />
+    <ant dir="Memento" usenativebasedir="true" target="download-deps" />
+    <ant dir="Net" usenativebasedir="true" target="download-deps" />
   </target>
   
   <target name="clean-reports">
     <delete dir="tests"/>
     <delete dir="coverage"/>
-    <ant dir="Core" target="clean-reports" />
-    <ant dir="Net" target="clean-reports" />
-    <ant dir="Memento" target="clean-reports" />
+    <ant dir="Core" usenativebasedir="true" target="clean-reports" />
+    <ant dir="Memento" usenativebasedir="true" target="clean-reports" />
+    <ant dir="Net" usenativebasedir="true" target="clean-reports" />
   </target>
   
+  <target name="clean">
+    <delete dir="tests"/>
+    <delete dir="coverage"/>
+    <ant dir="Core" usenativebasedir="true" target="clean" />
+    <ant dir="Memento" usenativebasedir="true" target="clean" />
+    <ant dir="Net" usenativebasedir="true" target="clean" />
+  </target>
+
   <target name="wipe">
     <delete dir="tests"/>
     <delete dir="coverage"/>
-    <ant dir="Core" target="wipe" />
-    <ant dir="Net" target="wipe" />
-    <ant dir="Memento" target="wipe" />
+    <ant dir="Core" usenativebasedir="true" target="wipe" />
+    <ant dir="Memento" usenativebasedir="true" target="wipe" />
+    <ant dir="Net" usenativebasedir="true" target="wipe" />
   </target>
   
   <target name="test">
-    <ant dir="Core" target="test" />
-    <ant dir="Net" target="test" />
-    <ant dir="Memento" target="test" />
+    <ant dir="Core" usenativebasedir="true" target="test" />
+    <ant dir="Memento" usenativebasedir="true" target="test" />
   </target>
   
   <target name="junit-report">
@@ -94,8 +104,8 @@
   <target name="jacoco-report" depends="jacoco">
     <!-- Call the jacoco-report task on children -->
     <ant dir="Core" usenativebasedir="true" target="jacoco-report" />
-    <ant dir="Net" usenativebasedir="true" target="jacoco-report" />
     <ant dir="Memento" usenativebasedir="true" target="jacoco-report" />
+    <ant dir="Net" usenativebasedir="true" target="jacoco-report" />
     <!-- Load JaCoCo -->
     <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
       <classpath path="${build.libdir}/jacocoant.jar"/>
@@ -103,8 +113,8 @@
     <mkdir dir="coverage"/>
     <jacoco:merge destfile="coverage/merged.exec">
         <fileset dir="Core/tests/coverage" includes="*.exec"/>
-        <fileset dir="Net/tests/coverage" includes="*.exec"/>
         <fileset dir="Memento/tests/coverage" includes="*.exec"/>
+        <fileset dir="Net/tests/coverage" includes="*.exec"/>
     </jacoco:merge>
     <jacoco:report>
       <executiondata>
@@ -113,12 +123,13 @@
       <structure name="${build.name}">
         <classfiles>
             <fileset dir="Core/bin"/>
-            <fileset dir="Functions/bin"/>
+            <fileset dir="Memento/bin"/>
+            <fileset dir="Net/bin"/>
         </classfiles>
         <sourcefiles encoding="UTF-8">
           <fileset dir="Core/src"/>
-          <fileset dir="Net/src"/>
           <fileset dir="Memento/src"/>
+          <fileset dir="Net/src"/>
         </sourcefiles>
       </structure>
       <html destdir="coverage"/>
@@ -192,7 +203,7 @@
       <group title="Memento" packages="ca.uqac.lif.fs.memento:ca.uqac.lif.fs.memento.*"/>
     </javadoc>
     <!--<copy todir="../docs/javadoc/doc-files">
-      <fileset dir="Examples/src/doc-files"/>
+      <fileset dir="Net/src/doc-files"/>
     </copy>-->
   </target>
 </project>

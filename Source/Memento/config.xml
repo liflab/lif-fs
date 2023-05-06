@@ -26,7 +26,7 @@
   <name>lif-fs Memento</name>
   
   <!-- The project's version number -->
-  <version>0.1-alpha</version>
+  <version>0.2.1</version>
   
   <!-- The project's author. Currently this only
   shows up in the footer of the Javadoc documentation. -->
@@ -56,7 +56,7 @@
   
   <!-- Output jar -->
   <jar>
-    <filename>../lif-fs-memento.jar</filename>
+    <filename>../lif-fs-memento</filename>
     <withdoc>false</withdoc>
     <withdeps>true</withdeps>
   </jar>
