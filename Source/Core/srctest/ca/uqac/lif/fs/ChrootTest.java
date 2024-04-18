@@ -1,6 +1,6 @@
 /*
   Abstract file system manipulations
-  Copyright (C) 2022 Sylvain Hallé
+  Copyright (C) 2022-2024 Sylvain Hallé
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@ package ca.uqac.lif.fs;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import org.junit.Test;
@@ -40,6 +42,22 @@ public class ChrootTest
 		assertEquals(2, listing.size());
 		assertTrue(listing.contains("ghi"));
 		assertTrue(listing.contains("e.txt"));
+		fs.close();
+	}
+	
+	@Test
+	public void test2() throws FileSystemException, IOException
+	{
+		RamDisk rd = new RamDisk();
+		rd.open();
+		TempFolderTest.populate(rd);
+		Chroot fs = new Chroot(rd, "/def/ghi");
+		fs.open();
+		InputStream is = fs.readFrom("c.txt");
+		byte[] bytes = FileUtils.toBytes(is);
+		is.close();
+		String s = new String(bytes).trim();
+		assertEquals("Four score and seven years ago", s);
 		fs.close();
 	}
 }

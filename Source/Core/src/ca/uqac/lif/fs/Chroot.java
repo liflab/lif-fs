@@ -1,6 +1,6 @@
 /*
   Abstract file system manipulations
-  Copyright (C) 2022 Sylvain Hallé
+  Copyright (C) 2022-2024 Sylvain Hallé
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -128,8 +128,8 @@ public class Chroot extends FilterFileSystem
 		String wd = m_fs.pwd();
 		if (wd.startsWith(FilePath.SLASH))
 		{
-			return m_root.toString() + wd;
+			return m_root.toString() + wd + path;
 		}
-		return m_root.toString() + FilePath.SLASH + wd;
+		return m_root.toString() + FilePath.SLASH + wd + path;
 	}
 }
