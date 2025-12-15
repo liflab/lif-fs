@@ -51,6 +51,85 @@ As another interesting side effect, many file system objects of the library take
 
 If the available file systems do not suit your needs, users are free to write their own. The `FilterFileSystem` class is useful for that purpose, as it delegates all its operations to another file system instance; descendants of this class may elect to override some of these methods to perform different operations. See the examples below for some cases of custom file systems.
 
+Reified file systems
+--------------------
+
+Some file system implementations (e.g. FTP, archive-based, or virtual file systems) do not expose concrete local paths. This may prevent their use with external tools that expect regular files on the local disk.
+
+To address this, *lif-fs* supports **reified file systems**, which temporarily materialize a file system on the local disk.
+
+### Principle
+
+Reification produces a concrete, local view of a `FileSystem`.
+
+- Files and directories are materialized on demand in a temporary directory.
+- External tools may freely operate on the resulting local paths.
+- Changes may optionally be committed back to the original file system.
+- While reified, the original file system is exclusively leased and cannot be used
+  directly.
+
+Reification is short-lived and must be explicitly released.
+
+### ReifiableFileSystem
+
+A file system that supports reification implements `ReifiableFileSystem`:
+
+```java
+ReifiedFileSystem rfs = fs.reify();
+```
+
+The returned object:
+
+- implements `FileSystem`,
+- provides access to concrete paths via `toLocalPath(String)`,
+- buffers all modifications locally.
+
+### Using a reified file system
+
+```java
+ReifiedFileSystem rfs = fs.reify();
+
+Path in  = rfs.toLocalPath("/data/input.txt");
+Path out = rfs.toLocalPath("/data/output");
+
+ProcessBuilder pb =
+    new ProcessBuilder("external-tool",
+        in.toString(), out.toString());
+pb.start().waitFor();
+
+rfs.commit();   // optional
+rfs.release();  // mandatory
+```
+
+### Commit and release
+
+- `commit()`  
+  Copies all materialized files and directories back to the original file system.
+
+- `release()`  
+  Terminates the reification:
+  - releases the exclusive lease,
+  - deletes temporary local data,
+  - discards uncommitted changes.
+
+After `release()`, the reified file system is no longer usable.
+
+### HardDisk behavior
+
+For `HardDisk`, reification is an identity operation:
+
+- no temporary directory is created,
+- `toLocalPath()` returns the actual filesystem path,
+- `commit()` is a no-op.
+
+This allows client code to use reification uniformly, regardless of whether the underlying file system is local or remote.
+
+### Notes
+
+- Reification is backend-agnostic and relies only on the `FileSystem` API.
+- No synchronization or conflict resolution is performed.
+- The backing file system is assumed not to be modified concurrently during reification.
+
 Examples
 --------
 

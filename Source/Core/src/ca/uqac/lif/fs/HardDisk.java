@@ -1,6 +1,6 @@
 /*
   Abstract file system manipulations
-  Copyright (C) 2022 Sylvain Hallé
+  Copyright (C) 2022-2025 Sylvain Hallé
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -36,14 +36,15 @@ import java.util.Stack;
 import java.util.stream.Stream;
 
 /**
- * A file system that interacts with concrete files of a local machine's
- * hard drive. Optionally, the class can be given a folder name, which
- * will be taken as the root of the file system exposed to the user. In such a
- * way, {@link HardDisk} can perform an operation similar to
+ * A file system that interacts with concrete files of a local machine's hard
+ * drive. Optionally, the class can be given a folder name, which will be taken
+ * as the root of the file system exposed to the user. In such a way,
+ * {@link HardDisk} can perform an operation similar to
  * <a href="https://en.wikipedia.org/wiki/Chroot"><tt>chroot</tt></a>
+ * 
  * @author Sylvain Hallé
  */
-public class HardDisk implements FileSystem
+public class HardDisk extends AbstractReifiableFileSystem
 {
 	/**
 	 * The system-dependent carriage return symbol
@@ -59,7 +60,7 @@ public class HardDisk implements FileSystem
 	 * The path of the directory on the local file system that is exposed as the
 	 * "root" directory by this file system object.
 	 */
-	/*@ non_null @*/ protected FilePath m_root;
+	/* @ non_null @ */ protected FilePath m_root;
 
 	/**
 	 * The path representing the current directory.
@@ -75,11 +76,11 @@ public class HardDisk implements FileSystem
 	 * The current state of the file system.
 	 */
 	protected OpenState m_state;
-	
+
 	/**
-	 * Creates a new local file system, using the root of the underlying file
-	 * system as its root, and setting its current directory to the current
-	 * working directory in that file system.
+	 * Creates a new local file system, using the root of the underlying file system
+	 * as its root, and setting its current directory to the current working
+	 * directory in that file system.
 	 */
 	public HardDisk()
 	{
@@ -91,10 +92,12 @@ public class HardDisk implements FileSystem
 	}
 
 	/**
-	 * Creates a new local file system, using an underlying file system folder
-	 * as its root.
-	 * @param root The folder in the underlying file system that will act as the
-	 * root of the created file system
+	 * Creates a new local file system, using an underlying file system folder as
+	 * its root.
+	 * 
+	 * @param root
+	 *          The folder in the underlying file system that will act as the root
+	 *          of the created file system
 	 */
 	public HardDisk(String root)
 	{
@@ -108,9 +111,10 @@ public class HardDisk implements FileSystem
 	/**
 	 * Gets the path on the local machine corresponding to the root of the file
 	 * system.
+	 * 
 	 * @return The path
 	 */
-	/*@ pure non_null @*/ public FilePath getRoot()
+	/* @ pure non_null @ */ public FilePath getRoot()
 	{
 		return m_root;
 	}
@@ -330,7 +334,9 @@ public class HardDisk implements FileSystem
 
 	/**
 	 * Gets the absolute path corresponding to a path within the file system
-	 * @param path The path
+	 * 
+	 * @param path
+	 *          The path
 	 * @return The absolute path on the local machine
 	 */
 	protected Path getPath(String path)
@@ -343,13 +349,13 @@ public class HardDisk implements FileSystem
 		return Paths.get(m_root.toString() + SLASH + fp.toString());
 	}
 
-	protected static void deleteDirectoryRecursion(Path path) throws IOException 
+	protected static void deleteDirectoryRecursion(Path path) throws IOException
 	{
 		if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS))
 		{
-			try (DirectoryStream<Path> entries = Files.newDirectoryStream(path)) 
+			try (DirectoryStream<Path> entries = Files.newDirectoryStream(path))
 			{
-				for (Path entry : entries) 
+				for (Path entry : entries)
 				{
 					deleteDirectoryRecursion(entry);
 				}
@@ -357,4 +363,163 @@ public class HardDisk implements FileSystem
 		}
 		Files.delete(path);
 	}
+
+	@Override
+	protected ReifiedFileSystem createReifiedFileSystem(Object token)
+  {
+    return new ReifiedFileSystem()
+    {
+      private boolean m_closed = false;
+
+      private void checkOpen() throws FileSystemException
+      {
+        if (m_closed)
+        {
+          throw new FileSystemException("Reified file system is closed");
+        }
+      }
+
+      @Override
+      public Path toLocalPath(String path) throws FileSystemException
+      {
+        checkOpen();
+        // HardDisk.getPath already resolves against root + current dir
+        return HardDisk.this.getPath(path);
+      }
+
+      @Override
+      public void commit() throws FileSystemException
+      {
+        checkOpen();
+        // Identity reification: nothing to sync
+      }
+
+      @Override
+      public FileSystem open() throws FileSystemException
+      {
+        checkOpen();
+        // Optional: either delegate or no-op. Delegating is usually fine.
+        HardDisk.this.open();
+        return this;
+      }
+
+      @Override
+      public List<String> ls() throws FileSystemException
+      {
+        checkOpen();
+        return HardDisk.this.ls();
+      }
+
+      @Override
+      public List<String> ls(String path) throws FileSystemException
+      {
+        checkOpen();
+        return HardDisk.this.ls(path);
+      }
+
+      @Override
+      public boolean isDirectory(String path) throws FileSystemException
+      {
+        checkOpen();
+        return HardDisk.this.isDirectory(path);
+      }
+
+      @Override
+      public boolean isFile(String path) throws FileSystemException
+      {
+        checkOpen();
+        return HardDisk.this.isFile(path);
+      }
+
+      @Override
+      public long getSize(String path) throws FileSystemException
+      {
+        checkOpen();
+        return HardDisk.this.getSize(path);
+      }
+
+      @Override
+      public OutputStream writeTo(String filename) throws FileSystemException
+      {
+        checkOpen();
+        return HardDisk.this.writeTo(filename);
+      }
+
+      @Override
+      public InputStream readFrom(String filename) throws FileSystemException
+      {
+        checkOpen();
+        return HardDisk.this.readFrom(filename);
+      }
+
+      @Override
+      public void chdir(String path) throws FileSystemException
+      {
+        checkOpen();
+        HardDisk.this.chdir(path);
+      }
+
+      @Override
+      public void pushd(String path) throws FileSystemException
+      {
+        checkOpen();
+        HardDisk.this.pushd(path);
+      }
+
+      @Override
+      public void popd() throws FileSystemException
+      {
+        checkOpen();
+        HardDisk.this.popd();
+      }
+
+      @Override
+      public void mkdir(String path) throws FileSystemException
+      {
+        checkOpen();
+        HardDisk.this.mkdir(path);
+      }
+
+      @Override
+      public void rmdir(String path) throws FileSystemException
+      {
+        checkOpen();
+        HardDisk.this.rmdir(path);
+      }
+
+      @Override
+      public void delete(String path) throws FileSystemException
+      {
+        checkOpen();
+        HardDisk.this.delete(path);
+      }
+
+      @Override
+      public String pwd() throws FileSystemException
+      {
+        checkOpen();
+        return HardDisk.this.pwd();
+      }
+
+      /**
+       * Releases the lease and ends the reification. For an identity reification,
+       * this should NOT close the underlying HardDisk (caller may want to keep it open).
+       */
+      @Override
+      public void close() throws FileSystemException
+      {
+        if (m_closed)
+        {
+          return;
+        }
+        m_closed = true;
+
+        // Default rollback if not committed (no-op here anyway)
+        // if (!m_committed) { ... }
+
+        // Release exclusive lease held by this reified wrapper
+        releaseLease(token);
+      }
+    };
+  }
 }

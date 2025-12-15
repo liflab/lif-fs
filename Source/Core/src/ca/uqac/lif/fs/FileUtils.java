@@ -1,6 +1,6 @@
 /*
   Abstract file system manipulations
-  Copyright (C) 2022 Sylvain Hallé
+  Copyright (C) 2022-2025 Sylvain Hallé
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import java.util.List;
 
 /**
  * A set of static methods for common operations on files and file systems.
+ * 
  * @author Sylvain Hallé
  */
 public class FileUtils
@@ -39,16 +40,21 @@ public class FileUtils
 	{
 		super();
 	}
-	
+
 	/**
 	 * Writes an array of bytes into a file on a file system.
-	 * @param fs The file system to interact with
-	 * @param content The byte array to write
-	 * @param path The path of the file to write to
-	 * @throws FileSystemException Thrown if the operation could not
-	 * proceed
+	 * 
+	 * @param fs
+	 *          The file system to interact with
+	 * @param content
+	 *          The byte array to write
+	 * @param path
+	 *          The path of the file to write to
+	 * @throws FileSystemException
+	 *           Thrown if the operation could not proceed
 	 */
-	public static void writeBytesTo(FileSystem fs, byte[] content, String path) throws FileSystemException
+	public static void writeBytesTo(FileSystem fs, byte[] content, String path)
+			throws FileSystemException
 	{
 		OutputStream os = fs.writeTo(path);
 		copy(toStream(content), os);
@@ -61,27 +67,35 @@ public class FileUtils
 			throw new FileSystemException(e);
 		}
 	}
-	
+
 	/**
 	 * Writes a string into a file on a file system.
-	 * @param fs The file system to interact with
-	 * @param content The byte array to write
-	 * @param path The path of the file to write to
-	 * @throws FileSystemException Thrown if the operation could not
-	 * proceed
+	 * 
+	 * @param fs
+	 *          The file system to interact with
+	 * @param content
+	 *          The byte array to write
+	 * @param path
+	 *          The path of the file to write to
+	 * @throws FileSystemException
+	 *           Thrown if the operation could not proceed
 	 */
-	public static void writeStringTo(FileSystem fs, String content, String path) throws FileSystemException
+	public static void writeStringTo(FileSystem fs, String content, String path)
+			throws FileSystemException
 	{
 		writeBytesTo(fs, content.getBytes(), path);
 	}
-	
+
 	/**
 	 * Reads an array of bytes from a file on a file system.
-	 * @param fs The file system to interact with
-	 * @param path The path of the file to read from
+	 * 
+	 * @param fs
+	 *          The file system to interact with
+	 * @param path
+	 *          The path of the file to read from
 	 * @return The array of bytes
-	 * @throws FileSystemException Thrown if the operation could not
-	 * proceed
+	 * @throws FileSystemException
+	 *           Thrown if the operation could not proceed
 	 */
 	public static byte[] readBytesFrom(FileSystem fs, String path) throws FileSystemException
 	{
@@ -97,30 +111,38 @@ public class FileUtils
 		}
 		return out;
 	}
-	
+
 	/**
 	 * Reads a character string from a file on a file system.
-	 * @param fs The file system to interact with
-	 * @param path The path of the file to read from
+	 * 
+	 * @param fs
+	 *          The file system to interact with
+	 * @param path
+	 *          The path of the file to read from
 	 * @return The character string
-	 * @throws FileSystemException Thrown if the operation could not
-	 * proceed
+	 * @throws FileSystemException
+	 *           Thrown if the operation could not proceed
 	 */
 	public static String readStringFrom(FileSystem fs, String path) throws FileSystemException
 	{
 		return new String(readBytesFrom(fs, path));
 	}
-	
+
 	/**
 	 * Filters the files of a directory listing according to a filename pattern.
-	 * @param fs The file system to list
-	 * @param path The path in the file system to list
-	 * @param pattern The filename pattern, expressed as a regular expression
+	 * 
+	 * @param fs
+	 *          The file system to list
+	 * @param path
+	 *          The path in the file system to list
+	 * @param pattern
+	 *          The filename pattern, expressed as a regular expression
 	 * @return The list of files matching the pattern
-	 * @throws FileSystemException Thrown if the operation could not
-	 * proceed
+	 * @throws FileSystemException
+	 *           Thrown if the operation could not proceed
 	 */
-	public static List<String> ls(FileSystem fs, String path, String pattern) throws FileSystemException
+	public static List<String> ls(FileSystem fs, String path, String pattern)
+			throws FileSystemException
 	{
 		List<String> listing = fs.ls(path);
 		Iterator<String> it = listing.iterator();
@@ -134,13 +156,15 @@ public class FileUtils
 		}
 		return listing;
 	}
-	
+
 	/**
 	 * Reads data from an input stream and puts it into an array of bytes.
-	 * @param is The input stream
+	 * 
+	 * @param is
+	 *          The input stream
 	 * @return The array of bytes
-	 * @throws FileSystemException Thrown if the operation could not
-	 * proceed
+	 * @throws FileSystemException
+	 *           Thrown if the operation could not proceed
 	 */
 	public static byte[] toBytes(InputStream is) throws FileSystemException
 	{
@@ -150,13 +174,15 @@ public class FileUtils
 	}
 
 	/**
-	 * Copies the content of an input stream to an output stream. The method
-	 * assumes that the input streams are open, and lets the user close them
-	 * manually.
-	 * @param from The input stream to read from
-	 * @param to The output stream to write to
-	 * @throws FileSystemException Thrown if the copying process could not
-	 * proceed
+	 * Copies the content of an input stream to an output stream. The method assumes
+	 * that the input streams are open, and lets the user close them manually.
+	 * 
+	 * @param from
+	 *          The input stream to read from
+	 * @param to
+	 *          The output stream to write to
+	 * @throws FileSystemException
+	 *           Thrown if the copying process could not proceed
 	 */
 	public static void copy(InputStream from, OutputStream to) throws FileSystemException
 	{
@@ -164,24 +190,26 @@ public class FileUtils
 		byte[] bytes = new byte[1024];
 		try
 		{
-			while ((length = from.read(bytes)) != -1) 
+			while ((length = from.read(bytes)) != -1)
 			{
 				to.write(bytes, 0, length);
 			}
 		}
-		catch (IOException ex) 
+		catch (IOException ex)
 		{
-			throw new FileSystemException(ex); 
+			throw new FileSystemException(ex);
 		}
 	}
 
 	/**
-	 * Copies all the files and folders of a file system into another file
-	 * system.
-	 * @param from The file system to copy from
-	 * @param to The file system to copy to
-	 * @throws FileSystemException Thrown if the copying process could not
-	 * proceed for some reason
+	 * Copies all the files and folders of a file system into another file system.
+	 * 
+	 * @param from
+	 *          The file system to copy from
+	 * @param to
+	 *          The file system to copy to
+	 * @throws FileSystemException
+	 *           Thrown if the copying process could not proceed for some reason
 	 */
 	public static void copy(FileSystem from, FileSystem to) throws FileSystemException
 	{
@@ -218,15 +246,17 @@ public class FileUtils
 			to.popd();
 		}
 	}
-	
+
 	/**
-	 * Gets the size of a folder, including that of all its files and
-	 * sub-folders.
-	 * @param fs The file system
-	 * @param path The folder
+	 * Gets the size of a folder, including that of all its files and sub-folders.
+	 * 
+	 * @param fs
+	 *          The file system
+	 * @param path
+	 *          The folder
 	 * @return The size of the folder, in bytes
-	 * @throws FileSystemException Thrown if the copying process could not
-	 * proceed for some reason
+	 * @throws FileSystemException
+	 *           Thrown if the copying process could not proceed for some reason
 	 */
 	public static long getSize(FileSystem fs, String path) throws FileSystemException
 	{
@@ -236,31 +266,37 @@ public class FileUtils
 		fs.popd();
 		return ts.getSize();
 	}
-	
+
 	/**
 	 * Makes an array of bytes accessible though an input stream.
-	 * @param bytes The array of bytes
+	 * 
+	 * @param bytes
+	 *          The array of bytes
 	 * @return An input stream open on this array of bytes
 	 */
 	public static InputStream toStream(byte[] bytes)
 	{
 		return new ByteArrayInputStream(bytes);
 	}
-	
+
 	/**
 	 * Makes a string accessible though an input stream.
-	 * @param bytes The string
+	 * 
+	 * @param bytes
+	 *          The string
 	 * @return An input stream open on the array of bytes corresponding to the
-	 * string
+	 *         string
 	 */
 	public static InputStream toStream(String s)
 	{
 		return new ByteArrayInputStream(s.getBytes());
 	}
-	
+
 	/**
 	 * Trims a string of its forward slash if it has one.
-	 * @param s The string
+	 * 
+	 * @param s
+	 *          The string
 	 * @return The trimmed string
 	 */
 	public static String trimSlash(String s)
@@ -271,7 +307,31 @@ public class FileUtils
 		}
 		return s;
 	}
-	
+
+	static void mkdirs(FileSystem fs, String path) throws FileSystemException
+	{
+		if (path == null || path.isEmpty() || "/".equals(path))
+			return;
+		String p = path.startsWith("/") ? path.substring(1) : path;
+		String[] parts = p.split("/");
+		String cur = "";
+		for (String part : parts)
+		{
+			if (part.isEmpty())
+				continue;
+			cur += "/" + part;
+			try
+			{
+				fs.mkdir(cur);
+			}
+			catch (FileSystemException e)
+			{
+				// OK to ignore “already exists” if implementations throw; otherwise just keep
+				// it simple.
+			}
+		}
+	}
+
 	/**
 	 * Visitor calculating the total size of all files inside a folder and its
 	 * sub-folders.
@@ -285,7 +345,9 @@ public class FileUtils
 
 		/**
 		 * Creates a new visitor.
-		 * @param fs The file system to visit
+		 * 
+		 * @param fs
+		 *          The file system to visit
 		 */
 		public TotalSize(FileSystem fs)
 		{
@@ -298,15 +360,16 @@ public class FileUtils
 		{
 			m_totalSize += m_fs.getSize(filename.toString());
 		}
-		
+
 		/**
 		 * Gets the total size of all visited files.
+		 * 
 		 * @return The size, in bytes
 		 */
 		public long getSize()
 		{
 			return m_totalSize;
 		}
-		
+
 	}
 }
