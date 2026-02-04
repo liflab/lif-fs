@@ -1,6 +1,6 @@
 /*
   Abstract file system manipulations
-  Copyright (C) 2022 Sylvain Hallé
+  Copyright (C) 2022-2025 Sylvain Hallé
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ public class FilePathTest
 	{
 		List<String> parts = getList("foo", "..", "..");
 		List<String> simplified = FilePath.simplify(parts);
-		equalLists(getList(), simplified);
+		equalLists(getList(".."), simplified);
 	}
 	
 	@Test
@@ -66,7 +66,7 @@ public class FilePathTest
 	{
 		List<String> parts = getList("..", "foo", "bar");
 		List<String> simplified = FilePath.simplify(parts);
-		equalLists(getList("foo", "bar"), simplified);
+		equalLists(getList("..", "foo", "bar"), simplified);
 	}
 	
 	@Test
@@ -99,6 +99,30 @@ public class FilePathTest
 		FilePath fp1 = new FilePath("/foo/bar");
 		FilePath fp2 = fp1.chdir("/baz");
 		assertEquals("/baz", fp2.toString());
+	}
+	
+	@Test
+	public void testChdir5()
+	{
+		FilePath fp1 = new FilePath(".");
+		FilePath fp2 = fp1.chdir("../baz");
+		assertEquals("../baz", fp2.toString());
+	}
+	
+	@Test
+	public void testChdir6()
+	{
+		FilePath fp1 = new FilePath("/home/user");
+		FilePath fp2 = fp1.chdir("../baz");
+		assertEquals("/home/baz", fp2.toString());
+	}
+	
+	@Test
+	public void testChdir7()
+	{
+		FilePath fp1 = new FilePath("/home/user");
+		FilePath fp2 = fp1.chdir("/tmp/baz");
+		assertEquals("/tmp/baz", fp2.toString());
 	}
 	
 	protected static List<String> getList(String ... elements)

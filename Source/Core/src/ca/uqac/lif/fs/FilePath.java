@@ -193,21 +193,28 @@ public class FilePath
 	public static List<String> simplify(List<String> parts)
 	{
 		List<String> new_parts = new ArrayList<String>();
-		int eat = 0;
-		for (int i = parts.size() - 1; i >= 0; i--)
+		for (int i = 0; i < parts.size(); i++)
 		{
 			String p = parts.get(i);
+			if (p.compareTo(DOT) == 0)
+			{
+				continue;
+			}
 			if (p.compareTo(UP) == 0)
 			{
-				eat++;
+				// Go up one level: remove the last element in new_parts if any
+				if (!new_parts.isEmpty() && new_parts.get(0).compareTo(UP) != 0)
+				{
+					new_parts.remove(new_parts.size() - 1);
+				}
+				else
+				{
+					new_parts.add(UP);
+				}
 			}
 			else
 			{
-				if (eat == 0)
-				{
-					new_parts.add(0, p);
-				}
-				eat = Math.max(0, eat - 1);
+				new_parts.add(p);
 			}
 		}
 		return new_parts;
