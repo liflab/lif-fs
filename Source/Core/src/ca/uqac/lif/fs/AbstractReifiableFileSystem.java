@@ -88,4 +88,6 @@ public abstract class AbstractReifiableFileSystem implements ReifiableFileSystem
 					}
 				});
 	}
+	
+	protected abstract ReifiedFileSystem createReifiedFileSystem(Object token);
 }

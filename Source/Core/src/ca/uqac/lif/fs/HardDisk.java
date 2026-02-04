@@ -366,160 +366,166 @@ public class HardDisk extends AbstractReifiableFileSystem
 
 	@Override
 	protected ReifiedFileSystem createReifiedFileSystem(Object token)
-  {
-    return new ReifiedFileSystem()
-    {
-      private boolean m_closed = false;
+	{
+		return new ReifiedFileSystem()
+		{
+			private boolean m_closed = false;
 
-      private void checkOpen() throws FileSystemException
-      {
-        if (m_closed)
-        {
-          throw new FileSystemException("Reified file system is closed");
-        }
-      }
+			private void checkOpen() throws FileSystemException
+			{
+				if (m_closed)
+				{
+					throw new FileSystemException("Reified file system is closed");
+				}
+			}
 
-      @Override
-      public Path toLocalPath(String path) throws FileSystemException
-      {
-        checkOpen();
-        // HardDisk.getPath already resolves against root + current dir
-        return HardDisk.this.getPath(path);
-      }
+			@Override
+			public Path toLocalPath(String path) throws FileSystemException
+			{
+				checkOpen();
+				// HardDisk.getPath already resolves against root + current dir
+				return HardDisk.this.getPath(path);
+			}
 
-      @Override
-      public void commit() throws FileSystemException
-      {
-        checkOpen();
-        // Identity reification: nothing to sync
-      }
+			@Override
+			public void commit() throws FileSystemException
+			{
+				checkOpen();
+				// Identity reification: nothing to sync
+			}
 
-      @Override
-      public FileSystem open() throws FileSystemException
-      {
-        checkOpen();
-        // Optional: either delegate or no-op. Delegating is usually fine.
-        HardDisk.this.open();
-        return this;
-      }
+			@Override
+			public FileSystem open() throws FileSystemException
+			{
+				checkOpen();
+				// Optional: either delegate or no-op. Delegating is usually fine.
+				HardDisk.this.open();
+				return this;
+			}
 
-      @Override
-      public List<String> ls() throws FileSystemException
-      {
-        checkOpen();
-        return HardDisk.this.ls();
-      }
+			@Override
+			public List<String> ls() throws FileSystemException
+			{
+				checkOpen();
+				return HardDisk.this.ls();
+			}
 
-      @Override
-      public List<String> ls(String path) throws FileSystemException
-      {
-        checkOpen();
-        return HardDisk.this.ls(path);
-      }
+			@Override
+			public List<String> ls(String path) throws FileSystemException
+			{
+				checkOpen();
+				return HardDisk.this.ls(path);
+			}
 
-      @Override
-      public boolean isDirectory(String path) throws FileSystemException
-      {
-        checkOpen();
-        return HardDisk.this.isDirectory(path);
-      }
+			@Override
+			public boolean isDirectory(String path) throws FileSystemException
+			{
+				checkOpen();
+				return HardDisk.this.isDirectory(path);
+			}
 
-      @Override
-      public boolean isFile(String path) throws FileSystemException
-      {
-        checkOpen();
-        return HardDisk.this.isFile(path);
-      }
+			@Override
+			public boolean isFile(String path) throws FileSystemException
+			{
+				checkOpen();
+				return HardDisk.this.isFile(path);
+			}
 
-      @Override
-      public long getSize(String path) throws FileSystemException
-      {
-        checkOpen();
-        return HardDisk.this.getSize(path);
-      }
+			@Override
+			public long getSize(String path) throws FileSystemException
+			{
+				checkOpen();
+				return HardDisk.this.getSize(path);
+			}
 
-      @Override
-      public OutputStream writeTo(String filename) throws FileSystemException
-      {
-        checkOpen();
-        return HardDisk.this.writeTo(filename);
-      }
+			@Override
+			public OutputStream writeTo(String filename) throws FileSystemException
+			{
+				checkOpen();
+				return HardDisk.this.writeTo(filename);
+			}
 
-      @Override
-      public InputStream readFrom(String filename) throws FileSystemException
-      {
-        checkOpen();
-        return HardDisk.this.readFrom(filename);
-      }
+			@Override
+			public InputStream readFrom(String filename) throws FileSystemException
+			{
+				checkOpen();
+				return HardDisk.this.readFrom(filename);
+			}
 
-      @Override
-      public void chdir(String path) throws FileSystemException
-      {
-        checkOpen();
-        HardDisk.this.chdir(path);
-      }
+			@Override
+			public void chdir(String path) throws FileSystemException
+			{
+				checkOpen();
+				HardDisk.this.chdir(path);
+			}
 
-      @Override
-      public void pushd(String path) throws FileSystemException
-      {
-        checkOpen();
-        HardDisk.this.pushd(path);
-      }
+			@Override
+			public void pushd(String path) throws FileSystemException
+			{
+				checkOpen();
+				HardDisk.this.pushd(path);
+			}
 
-      @Override
-      public void popd() throws FileSystemException
-      {
-        checkOpen();
-        HardDisk.this.popd();
-      }
+			@Override
+			public void popd() throws FileSystemException
+			{
+				checkOpen();
+				HardDisk.this.popd();
+			}
 
-      @Override
-      public void mkdir(String path) throws FileSystemException
-      {
-        checkOpen();
-        HardDisk.this.mkdir(path);
-      }
+			@Override
+			public void mkdir(String path) throws FileSystemException
+			{
+				checkOpen();
+				HardDisk.this.mkdir(path);
+			}
 
-      @Override
-      public void rmdir(String path) throws FileSystemException
-      {
-        checkOpen();
-        HardDisk.this.rmdir(path);
-      }
+			@Override
+			public void rmdir(String path) throws FileSystemException
+			{
+				checkOpen();
+				HardDisk.this.rmdir(path);
+			}
 
-      @Override
-      public void delete(String path) throws FileSystemException
-      {
-        checkOpen();
-        HardDisk.this.delete(path);
-      }
+			@Override
+			public void delete(String path) throws FileSystemException
+			{
+				checkOpen();
+				HardDisk.this.delete(path);
+			}
 
-      @Override
-      public String pwd() throws FileSystemException
-      {
-        checkOpen();
-        return HardDisk.this.pwd();
-      }
+			@Override
+			public String pwd() throws FileSystemException
+			{
+				checkOpen();
+				return HardDisk.this.pwd();
+			}
 
-      /**
-       * Releases the lease and ends the reification. For an identity reification,
-       * this should NOT close the underlying HardDisk (caller may want to keep it open).
-       */
-      @Override
-      public void close() throws FileSystemException
-      {
-        if (m_closed)
-        {
-          return;
-        }
-        m_closed = true;
+			/**
+			 * Releases the lease and ends the reification. For an identity reification,
+			 * this should NOT close the underlying HardDisk (caller may want to keep it open).
+			 */
+			@Override
+			public void close() throws FileSystemException
+			{
+				if (m_closed)
+				{
+					return;
+				}
+				m_closed = true;
 
-        // Default rollback if not committed (no-op here anyway)
-        // if (!m_committed) { ... }
+				// Default rollback if not committed (no-op here anyway)
+				// if (!m_committed) { ... }
 
-        // Release exclusive lease held by this reified wrapper
-        releaseLease(token);
-      }
-    };
-  }
+				// Release exclusive lease held by this reified wrapper
+				releaseLease(token);
+			}
+
+			@Override
+			public void release() throws FileSystemException {
+				// TODO Auto-generated method stub
+				
+			}
+		};
+	}
 }
